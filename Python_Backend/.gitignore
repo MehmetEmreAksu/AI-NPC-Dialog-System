@@ -1,0 +1,25 @@
+# =============== PYTHON .GITIGNORE ===============
+# Sanal ortam klasörü (Eğer venv kullanıyorsan)
+venv/
+env/
+.env
+
+# Python derleme çöpleri
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE Çöpleri
+.vscode/
+.idea/
+
+# BÜYÜ BURADA: Senin projeye özel çöpler!
+# 1. Yapay zeka hafıza veritabanı (Boyutu çok büyür, git'e atılmaz)
+npc_bellek/
+
+# 2. Orpheus'un ürettiği geçici ses dosyası
+current_voice.wav
+
+# İşletim sistemi çöpleri
+.DS_Store
+Thumbs.db
