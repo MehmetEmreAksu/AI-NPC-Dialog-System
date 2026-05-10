@@ -1,10 +1,12 @@
 import json
 import uuid
 import io
+import os
 import numpy as np
 import soundfile as sf
 import scipy.io.wavfile as wavfile
 import chromadb
+import getpass
 from datetime import datetime
 from flask import Flask, request, jsonify, send_file
 from groq import Groq
@@ -20,7 +22,7 @@ app = Flask(__name__)
 ################################## API KEY #####################################
 ################################## API KEY #####################################
 ################################## API KEY #####################################
-client = Groq(api_key="Your API KEY")
+client = Groq(api_key="Your API Key")
 ################################## API KEY #####################################
 ################################## API KEY #####################################
 ################################## API KEY #####################################
@@ -31,9 +33,52 @@ client = Groq(api_key="Your API KEY")
 gecici_hafiza = {}
 MAX_MESAJ_SINIRI = 10  # 10 mesajda bir özetleyip kalıcı hafızaya atar
 
-chroma_istemci = chromadb.PersistentClient(path="./npc_bellek")
-bellek = chroma_istemci.get_or_create_collection(name="anilar")
+# Başlangıçta bunları boş bırakıyoruz, Unity'den komut gelince dolacaklar
+chroma_istemci = None
+bellek = None
+aktif_save_klasoru = None
 
+def veritabani_baglatisini_kur(save_folder_name):
+    global chroma_istemci, bellek, aktif_save_klasoru
+    
+    # 1. KONTROL: Eğer geçici (default) kurulum yapılıyorsa Unity klasörüne DOKUNMA
+    if save_folder_name == "default_save":
+        db_path = os.path.join(os.getcwd(), "temp_gecici_bellek")
+        print("\n[BİLGİ] Sunucu varsayılan (geçici) bellek ile başlatıldı.")
+    
+    # 2. GERÇEK KAYIT: Eğer Unity'den "save_01" gibi gerçek bir komut gelirse AppData'ya git
+    else:
+        kullanici_profili = os.environ.get('USERPROFILE')
+        local_low_yolu = os.path.join(kullanici_profili, 'AppData', 'LocalLow')
+        
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        company_name = "DefaultCompany" # Kendi ayarlarına göre düzeltmeyi unutma
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        game_name = "My project (1)"          # Kendi ayarlarına göre düzeltmeyi unutma
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        # --------------------------------------------------------------------------- ÖNEMLİ
+        
+        unity_save_path = os.path.join(local_low_yolu, company_name, game_name, "saves")
+        db_path = os.path.join(unity_save_path, save_folder_name, "npc_bellek")
+        
+        print(f"\n[HİZALANDI] Python artık Unity'nin save klasörüne bakıyor.")
+    
+    # Ortak İşlemler (Klasörü oluştur ve ChromaDB'yi bağla)
+    os.makedirs(db_path, exist_ok=True)
+    
+    chroma_istemci = chromadb.PersistentClient(path=db_path)
+    bellek = chroma_istemci.get_or_create_collection(name="anilar")
+    aktif_save_klasoru = save_folder_name
+    
+    print(f"Hedef Yol: {db_path}\n")
+
+# Geliştirme aşamasında sunucu ilk açıldığında çökmemesi için varsayılan bir DB başlatalım
+veritabani_baglatisini_kur("default_save")
 
 # ==========================================
 # 3. ÖZETLEME FONKSİYONU
@@ -285,6 +330,27 @@ def sohbeti_bitir():
 def ses_dosyasini_gonder():
     return send_file("current_voice.wav", mimetype="audio/wav")
 
+@app.route('/load_save', methods=['POST'])
+def save_dosyasini_yukle():
+    """Unity'den gelen Load Game isteğini karşılar ve veritabanı rotasını değiştirir."""
+    gelen_veri = request.json
+    save_folder = gelen_veri.get('save_folder') # Unity'den "save_01" gibi bir isim gelecek
+
+    if not save_folder:
+        return jsonify({"error": "Save klasörü belirtilmedi!"}), 400
+
+    try:
+        # 1. ChromaDB'yi yeni klasöre yönlendir
+        veritabani_baglatisini_kur(save_folder)
+        
+        # 2. Önceki save dosyasından kalan RAM'deki (geçici) muhabbetleri temizle
+        gecici_hafiza.clear() 
+        
+        return jsonify({"status": "success", "message": f"Sistem {save_folder} için hazır."}), 200
+        
+    except Exception as e:
+        print(f"Veritabanı değiştirme hatası: {e}")
+        return jsonify({"error": "Veritabanı yuklenemedi."}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8000)

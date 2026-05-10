@@ -1,4 +1,7 @@
 using UnityEngine;
+using UnityEngine.Networking;
+using System.Collections;
+using System.Text;
 using TMPro;
 using System.IO;
 using System.Linq; // Sýralama (OrderByDescending) iþlemleri için þart
@@ -73,8 +76,36 @@ public class SaveSlotManager : MonoBehaviour
         if (!string.IsNullOrEmpty(selectedFolderName))
         {
             Debug.Log($"{selectedFolderName} klasörü seçildi. Python backend'ine istek atýlýyor...");
-            // Burada Unity'nin WebRequest'i (veya HTTP Client'ý) ile Python Flask API'sine 
+            StartCoroutine(SendLoadRequestToPython(selectedFolderName));
             // "Seçilen Save Klasörü: selectedFolderName" bilgisini yollayacaksýn.
+        }
+    }
+
+    private IEnumerator SendLoadRequestToPython(string folderName)
+    {
+        string pythonUrl = "http://127.0.0.1:8000/load_save";
+
+        // Python'un beklediði JSON formatýný hazýrlýyoruz: {"save_folder": "save_01"}
+        string jsonData = "{\"save_folder\": \"" + folderName + "\"}";
+
+        using (UnityWebRequest request = new UnityWebRequest(pythonUrl, "POST"))
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Python RAG Veritabaný baþarýyla deðiþtirildi! Sinyal: " + request.downloadHandler.text);
+                // TODO: Buradan sonra Unity'nin SceneManager.LoadScene() komutu ile asýl oyun sahnesine geçiþ yapabilirsin.
+            }
+            else
+            {
+                Debug.LogError("Python ile iletiþim kurulamadý: " + request.error);
+            }
         }
     }
 }
