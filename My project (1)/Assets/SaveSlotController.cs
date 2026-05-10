@@ -52,7 +52,7 @@ public class SaveSlotManager : MonoBehaviour
                 {
                     string jsonContents = File.ReadAllText(metaFile);
                     GameSaveData data = JsonUtility.FromJson<GameSaveData>(jsonContents);
-                    slotTexts[i].text = $"Level {data.playerLevel} - {data.saveDate}";
+                    slotTexts[i].text = $"{data.saveName} <br><color=#A0A0A0><size=70%>{data.saveDate}</size></color>";
                 }
                 else
                 {
@@ -113,7 +113,6 @@ public class SaveSlotManager : MonoBehaviour
 [System.Serializable]
 public class GameSaveData
 {
-    public string playerName;
+    public string saveName;
     public string saveDate;
-    public int playerLevel;
 }
