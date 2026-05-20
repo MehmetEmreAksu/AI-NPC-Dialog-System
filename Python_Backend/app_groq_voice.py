@@ -1,13 +1,14 @@
 import json
+import os
 import uuid
 import io
-import os
+import getpass
 import numpy as np
 import soundfile as sf
 import scipy.io.wavfile as wavfile
 import chromadb
-import getpass
 from datetime import datetime
+from pathlib import Path
 from flask import Flask, request, jsonify, send_file
 from groq import Groq
 
@@ -16,16 +17,21 @@ app = Flask(__name__)
 # ==========================================
 # 1. YAPAY ZEKA VE API KONFİGÜRASYONU
 # ==========================================
-# UYARI: AGA ŞU KEY'İ GİT YENİLE, BURADA KABAK GİBİ DURMASIN!
+# API anahtarını önce ortam değişkeninden, yoksa apiKey.txt dosyasından oku.
+# apiKey.txt .gitignore'da — repoya ASLA commit edilmez.
+def _load_api_key() -> str:
+    env_key = os.environ.get("GROQ_API_KEY")
+    if env_key:
+        return env_key.strip()
+    key_file = Path(__file__).parent / "apiKey.txt"
+    if key_file.exists():
+        return key_file.read_text(encoding="utf-8").strip()
+    raise RuntimeError(
+        "Groq API anahtarı bulunamadı. GROQ_API_KEY ortam değişkenini ayarla "
+        "ya da Python_Backend/apiKey.txt dosyasına anahtarı yaz."
+    )
 
-
-################################## API KEY #####################################
-################################## API KEY #####################################
-################################## API KEY #####################################
-client = Groq(api_key="Your API Key")
-################################## API KEY #####################################
-################################## API KEY #####################################
-################################## API KEY #####################################
+client = Groq(api_key=_load_api_key())
 
 # ==========================================
 # 2. HAFIZA YÖNETİMİ AYARLARI

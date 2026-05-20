@@ -1,0 +1,120 @@
+# ============================================================
+#  AI-NPC Dialog System — Root .gitignore
+# ============================================================
+
+# ---------- Secrets / API keys ----------
+apiKey.txt
+*.apikey
+*.key
+.env
+.env.*
+secrets.json
+
+# ---------- OS junk ----------
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ---------- Editor / IDE ----------
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+*~
+
+# ---------- Claude Code local state ----------
+.claude/
+
+# ============================================================
+#  Python (Python_Backend/)
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+pip-wheel-metadata/
+
+# Virtual envs
+venv/
+env/
+.venv/
+ENV/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Project-specific Python artifacts
+Python_Backend/npc_bellek/
+Python_Backend/current_voice.wav
+Python_Backend/*.wav
+Python_Backend/apiKey.txt
+
+# ============================================================
+#  Unity (Unity_Client/)
+# ============================================================
+Unity_Client/[Ll]ibrary/
+Unity_Client/[Tt]emp/
+Unity_Client/[Oo]bj/
+Unity_Client/[Bb]uild/
+Unity_Client/[Bb]uilds/
+Unity_Client/[Ll]ogs/
+Unity_Client/[Uu]ser[Ss]ettings/
+Unity_Client/[Mm]emoryCaptures/
+Unity_Client/[Rr]ecordings/
+Unity_Client/[Cc]rash[Rr]eports/
+Unity_Client/[Aa]ssets/AssetStoreTools*
+Unity_Client/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# Visual Studio / Rider / VS Code generated
+Unity_Client/.vs/
+Unity_Client/.idea/
+Unity_Client/.gradle/
+Unity_Client/ExportedObj/
+Unity_Client/.consulo/
+
+# Generated project / solution files
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.unitypackage
+*.aps
+
+# Builds
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Unity meta junk
+sysinfo.txt
+
+# Crashlytics generated file
+crashlytics-build.properties
