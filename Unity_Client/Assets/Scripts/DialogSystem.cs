@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
 
+
 public class DialogSystem : MonoBehaviour
 {
     // Singleton instance for global access
@@ -27,6 +28,9 @@ public class DialogSystem : MonoBehaviour
     private AudioClip recordedClip;
     private bool isRecording = false;
     private float recordingStartTime;
+
+    [Header("Player State")]
+    public string currentPlayerAction = "standing still and looking at you";
 
 
     public bool isNpcSpeaking = false;
@@ -77,12 +81,6 @@ public class DialogSystem : MonoBehaviour
                 {
                     StopRecordingAndSendVoice();
                 }
-            }
-
-            // Listen for ESC key to close dialog
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                StopDialog();
             }
         }
     }
@@ -146,7 +144,7 @@ public class DialogSystem : MonoBehaviour
         // NetworkManager'a metin deðil, SES byte dizisini gönder diyoruz!
         if (NetworkManager.Instance != null)
         {
-            NetworkManager.Instance.SendVoiceToServer(wavData);
+            NetworkManager.Instance.SendVoiceToServer(wavData, currentNPC.npcID, currentPlayerAction, currentNPC.voiceModel);
         }
     }
 
@@ -164,7 +162,7 @@ public class DialogSystem : MonoBehaviour
         // Send the message via NetworkManager to the FastAPI server
         if (NetworkManager.Instance != null)
         {
-            NetworkManager.Instance.SendMessageToServer(typedMessage);
+            NetworkManager.Instance.SendMessageToServer(typedMessage, currentNPC.npcID, currentPlayerAction, currentNPC.voiceModel);
         }
         else
         {

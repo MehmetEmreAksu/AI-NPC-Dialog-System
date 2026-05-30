@@ -18,6 +18,10 @@ public class NPC_Roam : MonoBehaviour
     // ÝÞTE BÝZÝM FREN ÞALTERÝMÝZ BU
     private bool isTalkingMode = false;
 
+    [Header("NPC Identity")]
+    public string npcID = "Demirci";
+    public string voiceModel = "troy";
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();

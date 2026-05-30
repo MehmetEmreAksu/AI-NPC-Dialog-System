@@ -24,6 +24,7 @@ public class FPSController : MonoBehaviour
 
     void Update()
     {
+        if(Time.timeScale == 0f) return; // Oyun duraklatýldýðýnda hareketi engelle
         KameraHareketiniHesapla();
         YurumeHareketiniHesapla();
     }

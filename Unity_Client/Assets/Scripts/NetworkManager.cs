@@ -3,36 +3,37 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Text;
 
-// Represents the data payload sent to the Python API.
 [System.Serializable]
 public class APIRequestData
 {
     public string player_message;
     public string player_action;
+    public string npc_id;
+    public string voice_model;
+
+    public string npc_role;
+    public string suspect_name;
+    public string guilty_name;
 }
 
-// Represents the data payload received from the Python API.
 [System.Serializable]
 public class APIResponseData
 {
     public string npc_message;
     public string npc_emotion;
     public string npc_action;
-    public string audio_url; // Python'dan ses dosyasý gelirse bu alana URL'si gelecek
+    public string audio_url;
 }
 
 public class NetworkManager : MonoBehaviour
 {
-    // Singleton instance for global access.
     public static NetworkManager Instance { get; private set; }
 
     [Header("API Configuration")]
-    [Tooltip("Enter the server IP and port. Example: http://192.168.1.15:8000/chat")]
     public string apiUrl = "http://127.0.0.1:8000/chat";
 
     private void Awake()
     {
-        // Enforce Singleton pattern.
         if (Instance != null && Instance != this)
         {
             Destroy(this.gameObject);
@@ -41,38 +42,41 @@ public class NetworkManager : MonoBehaviour
         Instance = this;
     }
 
-    // Public method called by the DialogSystem when the player submits a message.
-    public void SendMessageToServer(string message)
+    // AGA BÜYÜ BURADA: Fonksiyon parametreleri eskisi gibi temiz (sadece 4 tane)!
+    public void SendMessageToServer(string message, string npcId, string action, string voiceModel)
     {
-        StartCoroutine(PostRequest(message));
+        StartCoroutine(PostRequest(message, npcId, action, voiceModel));
     }
 
-    // Coroutine to handle the asynchronous HTTP POST request.
-    private IEnumerator PostRequest(string message, string action = "")
+    private IEnumerator PostRequest(string message, string npcId, string action, string voiceModel)
     {
-        // 1. Prepare the JSON request data.
         APIRequestData requestData = new APIRequestData();
         requestData.player_message = message;
         requestData.player_action = action;
+        requestData.npc_id = npcId;
+        requestData.voice_model = voiceModel;
+
+        // VERÝYÝ ELDEN TAÞIMIYORUZ, DÝREKT MERKEZDEN ÇEKÝYORUZ!
+        if (GameManager.Instance != null)
+        {
+            requestData.npc_role = GameManager.Instance.GetNpcRole(npcId);
+            requestData.suspect_name = GameManager.Instance.suspectNPC;
+            requestData.guilty_name = GameManager.Instance.guiltyNPC;
+        }
 
         string jsonPayload = JsonUtility.ToJson(requestData);
 
-        // 2. Configure the HTTP request.
         UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonPayload);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        // 3. Send the request and wait for the server's response.
         yield return request.SendWebRequest();
 
-        // 4. Process the result.
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
             Debug.LogError("API Connection Error: " + request.error);
-
-            // Notify the dialog system about the failure.
             if (DialogSystem.Instance != null)
             {
                 DialogSystem.Instance.ReceiveResponse("System error: Could not connect to the server.", "calm", null);
@@ -87,40 +91,45 @@ public class NetworkManager : MonoBehaviour
 
             if (DialogSystem.Instance != null && responseData != null)
             {
-
-                // ZIRH: Eðer python emotion göndermeyi unutursa veya saçmalarsa varsayýlan olarak "calm" yap.
                 string receivedEmotion = string.IsNullOrEmpty(responseData.npc_emotion) ? "calm" : responseData.npc_emotion.ToLower();
 
                 if (!string.IsNullOrEmpty(responseData.audio_url))
                 {
                     StartCoroutine(DownloadAndPlayAudio(responseData.audio_url, responseData.npc_message, receivedEmotion));
                 }
-                else 
+                else
                 {
-
-                    // Hem metni hem duyguyu DialogSistemi'ne yolluyoruz
                     DialogSystem.Instance.ReceiveResponse(responseData.npc_message, receivedEmotion, null);
                 }
-
             }
         }
     }
 
-    // NetworkManager.cs içine eklenecek yeni fonksiyon
-    public void SendVoiceToServer(byte[] voiceData)
+    // SES FONKSÝYONU: Parametreleri yine temiz tuttuk!
+    public void SendVoiceToServer(byte[] voiceData, string npcId, string action, string voiceModel)
     {
-        StartCoroutine(PostVoiceRequest(voiceData));
+        StartCoroutine(PostVoiceRequest(voiceData, npcId, action, voiceModel));
     }
 
-    private IEnumerator PostVoiceRequest(byte[] voiceData)
+    private IEnumerator PostVoiceRequest(byte[] voiceData, string npcId, string action, string voiceModel)
     {
-        // Ses verisini form-data olarak hazýrlýyoruz (Týpký Postman'den dosya yükler gibi)
         WWWForm form = new WWWForm();
         form.AddBinaryData("voice_file", voiceData, "player_voice.wav", "audio/wav");
 
-        // Python'daki ses karþýlama endpoint'in. Örn: /chat/voice
-        string voiceApiUrl = "http://127.0.0.1:8000/chat/voice";
+        form.AddField("player_id", "default_player");
+        form.AddField("npc_id", npcId);
+        form.AddField("player_action", action);
+        form.AddField("voice_model", voiceModel);
 
+        // MERKEZDEN GÝZLÝCE ÇEKÝP FORMA EKLÝYORUZ!
+        if (GameManager.Instance != null)
+        {
+            form.AddField("npc_role", GameManager.Instance.GetNpcRole(npcId));
+            form.AddField("suspect_name", GameManager.Instance.suspectNPC);
+            form.AddField("guilty_name", GameManager.Instance.guiltyNPC);
+        }
+
+        string voiceApiUrl = "http://127.0.0.1:8000/chat/voice";
         UnityWebRequest request = UnityWebRequest.Post(voiceApiUrl, form);
         yield return request.SendWebRequest();
 
@@ -132,7 +141,6 @@ public class NetworkManager : MonoBehaviour
         }
         else
         {
-            // Python'dan gelen cevap tamamen ayný JSON yapýsýnda (text, emotion, action) dönecek
             string jsonResponse = request.downloadHandler.text;
             Debug.Log("<color=cyan>SES CEVABI GELDÝ: </color>" + jsonResponse);
 
@@ -153,7 +161,6 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    // --- ESC'YE BASILINCA ÇALIÞACAK FONKSÝYON ---
     public void SendEndChatSignal(string playerId)
     {
         StartCoroutine(PostEndChat(playerId));
@@ -161,10 +168,7 @@ public class NetworkManager : MonoBehaviour
 
     private IEnumerator PostEndChat(string playerId)
     {
-        // Python'daki end_chat adresin
         string endChatUrl = "http://127.0.0.1:8000/end_chat";
-
-        // JSON formatýnda player_id gönderiyoruz
         string jsonPayload = "{\"player_id\": \"" + playerId + "\"}";
 
         UnityWebRequest request = new UnityWebRequest(endChatUrl, "POST");
@@ -185,12 +189,9 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    // YENÝ FONKSÝYON: Sesi Streaming Mantýðýyla Ýndirir
     private IEnumerator DownloadAndPlayAudio(string url, string message, string emotion)
     {
-        // Cache Buster Hilesi: Unity'nin eski kaseti çalmasýný engellemek için url sonuna sahte zaman damgasý ekliyoruz
         string finalUrl = url + "?t=" + Time.realtimeSinceStartup;
-
         yield return new WaitForSeconds(0.25f);
 
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(finalUrl, AudioType.WAV))
@@ -205,11 +206,9 @@ public class NetworkManager : MonoBehaviour
             }
             else
             {
-                // Sesi yakaladýk!
                 AudioClip downloadedClip = DownloadHandlerAudioClip.GetContent(www);
                 DialogSystem.Instance.ReceiveResponse(message, emotion, downloadedClip);
             }
         }
     }
-
 }
