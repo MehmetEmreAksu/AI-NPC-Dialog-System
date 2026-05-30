@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: PT_Props_mat
   m_Shader: {fileID: 4800000, guid: 4e5c65c1d3e8564479e1074db8a9989f, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _METALLICON_ON
@@ -19,6 +21,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -42,11 +45,25 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AlphaCutoff: 0.5
     - _Ceramic1smoothness: 0.3
     - _Ceramic2smoothness: 0.3
     - _Ceramic3smoothness: 0.3
+    - _EnvironmentReflections: 1
     - _Metal1metallic: 0.476
     - _Metal1smootness: 0.579
     - _Metal2metallic: 0.65
@@ -54,13 +71,18 @@ Material:
     - _Metal3metallic: 0.516
     - _Metal3smootness: 0.299
     - _MetallicOn: 1
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
     - _SmoothnessOn: 1
+    - _SpecularHighlights: 1
     - __dirty: 0
     m_Colors:
     - _Ceramictiles1color: {r: 0.49056602, g: 0.03407811, b: 0, a: 1}
     - _Ceramictiles2color: {r: 0.7924528, g: 0.3776169, b: 0.1682093, a: 1}
     - _Ceramictiles3color: {r: 0.5943396, g: 0.19989102, b: 0.075694196, a: 1}
     - _Coatofarmscolor: {r: 1, g: 0.9621254, b: 0.9386792, a: 0}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Fabric1color: {r: 0.9056604, g: 0.7075957, b: 0.68778926, a: 0}
     - _Fabric2color: {r: 0.754717, g: 0, b: 0.04914194, a: 0}
     - _Fabric3color: {r: 0.5660378, g: 0.42156476, b: 0.248309, a: 0}
@@ -80,3 +102,4 @@ Material:
     - _Wood3color: {r: 0.1509434, g: 0.05293098, b: 0.039159846, a: 1}
     - _leather2color: {r: 0.6320754, g: 0.3730699, b: 0.2415005, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
