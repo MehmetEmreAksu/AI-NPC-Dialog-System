@@ -1,0 +1,42 @@
+# =============== UNITY .GITIGNORE ===============
+# Bu gereksiz klasörler asla GitHub'a gitmeyecek
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Hafıza dökümleri ve önbellekler
+MemoryCaptures/
+[Cc]rash[Rr]eports/
+
+# Asset Store'dan inen paketlerin geçici dosyaları
+/[Aa]ssets/AssetStoreTools*
+
+# Visual Studio ve Rider çöpleri
+.vs/
+.idea/
+.gradle/
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# İşletim sistemi çöpleri
+.DS_Store
+Thumbs.db
+Desktop.ini
