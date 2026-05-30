@@ -62,6 +62,7 @@ htmlcov/
 
 # Project-specific Python artifacts
 Python_Backend/npc_bellek/
+Python_Backend/temp_gecici_bellek/
 Python_Backend/current_voice.wav
 Python_Backend/*.wav
 Python_Backend/apiKey.txt
