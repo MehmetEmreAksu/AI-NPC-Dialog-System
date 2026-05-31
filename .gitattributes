@@ -1,0 +1,11 @@
+# Unity YAML dosyalari icin akilli birlestirme (UnityYAMLMerge / SmartMerge)
+# Her gelistirici, merge surucusunu kendi makinesinde tanimlamali:
+#   git config merge.unityyamlmerge.name "Unity SmartMerge"
+#   git config merge.unityyamlmerge.driver '"<UnityYAMLMerge.exe yolu>" merge -p "%O" "%B" "%A" "%A"'
+#   git config merge.unityyamlmerge.recursive binary
+*.unity   merge=unityyamlmerge
+*.prefab  merge=unityyamlmerge
+*.asset   merge=unityyamlmerge
+*.mat     merge=unityyamlmerge
+*.controller merge=unityyamlmerge
+*.anim    merge=unityyamlmerge
