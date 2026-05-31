@@ -14,6 +14,7 @@ public class APIRequestData
     public string npc_role;
     public string suspect_name;
     public string guilty_name;
+    public string time_of_day;
 }
 
 [System.Serializable]
@@ -62,6 +63,11 @@ public class NetworkManager : MonoBehaviour
             requestData.npc_role = GameManager.Instance.GetNpcRole(npcId);
             requestData.suspect_name = GameManager.Instance.suspectNPC;
             requestData.guilty_name = GameManager.Instance.guiltyNPC;
+        }
+
+        if (DayNightCycle.Instance != null)
+        {
+            requestData.time_of_day = DayNightCycle.Instance.currentTimePhase;
         }
 
         string jsonPayload = JsonUtility.ToJson(requestData);
@@ -127,6 +133,11 @@ public class NetworkManager : MonoBehaviour
             form.AddField("npc_role", GameManager.Instance.GetNpcRole(npcId));
             form.AddField("suspect_name", GameManager.Instance.suspectNPC);
             form.AddField("guilty_name", GameManager.Instance.guiltyNPC);
+        }
+
+        if (DayNightCycle.Instance != null)
+        {
+            form.AddField("time_of_day", DayNightCycle.Instance.currentTimePhase);
         }
 
         string voiceApiUrl = "http://127.0.0.1:8000/chat/voice";

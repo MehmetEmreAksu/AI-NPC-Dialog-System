@@ -4,16 +4,16 @@ using System.IO;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Text;
-using System; // Tarih (DateTime) iþlemleri için eklendi
+using System; // Tarih (DateTime) iï¿½lemleri iï¿½in eklendi
 
 public class MainMenuController : MonoBehaviour
 {
-    [Header("Menü Panelleri")]
-    public GameObject mainMenuPanel;  // Ana menü ekranýn
-    public GameObject settingsPanel;  // Ayarlar ekranýn
-    public GameObject loadGamePanel;  // Load Game ekranýn
+    [Header("Menï¿½ Panelleri")]
+    public GameObject mainMenuPanel;  // Ana menï¿½ ekranï¿½n
+    public GameObject settingsPanel;  // Ayarlar ekranï¿½n
+    public GameObject loadGamePanel;  // Load Game ekranï¿½n
 
-    // --- NEW GAME SÝSTEMÝ (Eski StartGame'in Yerine) ---
+    // --- NEW GAME Sï¿½STEMï¿½ (Eski StartGame'in Yerine) ---
     public void CreateNewGame()
     {
         string savesDirectory = Path.Combine(Application.persistentDataPath, "saves");
@@ -22,29 +22,32 @@ public class MainMenuController : MonoBehaviour
             Directory.CreateDirectory(savesDirectory);
         }
 
-        // 1. Çakýþmayý önlemek için tarihe dayalý eþsiz bir klasör adý (Örn: save_20260531_181530)
+        // 1. ï¿½akï¿½ï¿½mayï¿½ ï¿½nlemek iï¿½in tarihe dayalï¿½ eï¿½siz bir klasï¿½r adï¿½ (ï¿½rn: save_20260531_181530)
         string folderName = "save_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
         string newFolderPath = Path.Combine(savesDirectory, folderName);
         Directory.CreateDirectory(newFolderPath);
 
-        // 2. Sýfýr kilometre metadata.json dosyasýný oluþtur
+        // 2. Sï¿½fï¿½r kilometre metadata.json dosyasï¿½nï¿½ oluï¿½tur
         GameSaveData newData = new GameSaveData
         {
-            saveName = "Bilinmeyen Serüven", // Ýstersen bu baþlangýç ismini deðiþtirebilirsin
+            saveName = "Bilinmeyen Serï¿½ven", // ï¿½stersen bu baï¿½langï¿½ï¿½ ismini deï¿½iï¿½tirebilirsin
             saveDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm")
         };
 
         string jsonContents = JsonUtility.ToJson(newData, true);
         File.WriteAllText(Path.Combine(newFolderPath, "metadata.json"), jsonContents);
 
-        Debug.Log($"[NEW GAME] Yeni kayýt oluþturuldu: {folderName}. Python'a baðlanýlýyor...");
+        Debug.Log($"[NEW GAME] Yeni kayï¿½t oluï¿½turuldu: {folderName}. Python'a baï¿½lanï¿½lï¿½yor...");
 
-        // 3. Python'a bildir ve asýl oyuna gir
+        // 3. Python'a bildir ve asï¿½l oyuna gir
         StartCoroutine(SendNewGameRequestToPython(folderName));
     }
 
     private IEnumerator SendNewGameRequestToPython(string folderName)
     {
+        // Once Python sunucusunun ayaga kalkmasini bekle (ilk acilista birkac saniye surebilir).
+        yield return StartCoroutine(WaitForPythonServer());
+
         string pythonUrl = "http://127.0.0.1:8000/load_save";
         string jsonData = "{\"save_folder\": \"" + folderName + "\"}";
 
@@ -59,17 +62,46 @@ public class MainMenuController : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("[BAÞARILI] Python Yeni Veritabanýný Açtý! Oyuna giriliyor...");
-                SceneManager.LoadScene("Main"); // Sahnenin adýný doðrudan "Main" olarak yazdýk
+                Debug.Log("[BAï¿½ARILI] Python Yeni Veritabanï¿½nï¿½ Aï¿½tï¿½! Oyuna giriliyor...");
+                SceneManager.LoadScene("Main"); // Sahnenin adï¿½nï¿½ doï¿½rudan "Main" olarak yazdï¿½k
             }
             else
             {
-                Debug.LogError("Python'a ulaþýlamadý: " + request.error);
+                Debug.LogError("Python'a ulaï¿½ï¿½lamadï¿½: " + request.error);
             }
         }
     }
 
-    // --- ARAYÜZ (UI) YÖNETÝMÝ ---
+    // Sunucu /ping'e 200 donene kadar (veya zaman asimina kadar) yoklar.
+    private IEnumerator WaitForPythonServer()
+    {
+        string pingUrl = "http://127.0.0.1:8000/ping";
+        float timeout = 30f;        // en fazla 30 sn bekle
+        float elapsed = 0f;
+        float retryDelay = 0.5f;
+
+        while (elapsed < timeout)
+        {
+            using (UnityWebRequest ping = UnityWebRequest.Get(pingUrl))
+            {
+                ping.timeout = 2;
+                yield return ping.SendWebRequest();
+
+                if (ping.result == UnityWebRequest.Result.Success)
+                {
+                    Debug.Log("[SERVER] Python hazir.");
+                    yield break;
+                }
+            }
+
+            yield return new WaitForSeconds(retryDelay);
+            elapsed += retryDelay;
+        }
+
+        Debug.LogError("[SERVER] Python sunucusu 30 sn icinde ayaga kalkmadi!");
+    }
+
+    // --- ARAYï¿½Z (UI) Yï¿½NETï¿½Mï¿½ ---
 
     public void OpenSettings()
     {
@@ -95,10 +127,10 @@ public class MainMenuController : MonoBehaviour
         mainMenuPanel.SetActive(true);
     }
 
-    // EXIT butonu için
+    // EXIT butonu iï¿½in
     public void QuitGame()
     {
-        Debug.Log("Oyundan çýkýlýyor...");
+        Debug.Log("Oyundan ï¿½ï¿½kï¿½lï¿½yor...");
         Application.Quit();
     }
 }

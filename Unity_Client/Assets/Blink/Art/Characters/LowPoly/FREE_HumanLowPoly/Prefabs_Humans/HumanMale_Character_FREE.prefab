@@ -999,7 +999,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1438546959266459337}
   - component: {fileID: 4540229000190281644}
-  - component: {fileID: 7494722894864022740}
   m_Layer: 0
   m_Name: HumanMale_Character_FREE
   m_TagString: Untagged
@@ -1047,20 +1046,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7494722894864022740
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1782702501690864755}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4db03a306c0768c4cab72d22bfab4e45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPCProximity
-  npcAdi: "K\xF6y Sakini"
-  tetiklemeMesafesi: 3
 --- !u!1 &1789272960074739661
 GameObject:
   m_ObjectHideFlags: 0

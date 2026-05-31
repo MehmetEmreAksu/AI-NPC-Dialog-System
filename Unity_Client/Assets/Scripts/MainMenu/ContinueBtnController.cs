@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 using System.Collections;
 using System.Text;
 
-public class MainMenuManager : MonoBehaviour
+public class ContinueBtnController : MonoBehaviour
 {
     public Button btnContinue;
 
@@ -46,6 +46,9 @@ public class MainMenuManager : MonoBehaviour
 
     private IEnumerator SendContinueRequestToPython(string folderName)
     {
+        // Once Python sunucusunun ayaga kalkmasini bekle.
+        yield return StartCoroutine(WaitForPythonServer());
+
         string pythonUrl = "http://127.0.0.1:8000/load_save";
         string jsonData = "{\"save_folder\": \"" + folderName + "\"}";
 
@@ -60,11 +63,40 @@ public class MainMenuManager : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("[CONTINUE] Python Veritabaný Deðiþtirildi!");
-                // Yorum satýrýný kaldýrdýk ve sahne adýný "Main" olarak girdik:
+                Debug.Log("[CONTINUE] Python Veritabanï¿½ Deï¿½iï¿½tirildi!");
+                // Yorum satï¿½rï¿½nï¿½ kaldï¿½rdï¿½k ve sahne adï¿½nï¿½ "Main" olarak girdik:
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
             }
         }
+    }
+
+    // Sunucu /ping'e 200 donene kadar (veya zaman asimina kadar) yoklar.
+    private IEnumerator WaitForPythonServer()
+    {
+        string pingUrl = "http://127.0.0.1:8000/ping";
+        float timeout = 30f;
+        float elapsed = 0f;
+        float retryDelay = 0.5f;
+
+        while (elapsed < timeout)
+        {
+            using (UnityWebRequest ping = UnityWebRequest.Get(pingUrl))
+            {
+                ping.timeout = 2;
+                yield return ping.SendWebRequest();
+
+                if (ping.result == UnityWebRequest.Result.Success)
+                {
+                    Debug.Log("[SERVER] Python hazir.");
+                    yield break;
+                }
+            }
+
+            yield return new WaitForSeconds(retryDelay);
+            elapsed += retryDelay;
+        }
+
+        Debug.LogError("[SERVER] Python sunucusu 30 sn icinde ayaga kalkmadi!");
     }
 
     private void UpdateSaveDate(string folderName)
@@ -76,12 +108,12 @@ public class MainMenuManager : MonoBehaviour
             string jsonContents = File.ReadAllText(metaFile);
             GameSaveData data = JsonUtility.FromJson<GameSaveData>(jsonContents);
 
-            // Tarihi þu anki zamana güncelle
+            // Tarihi ï¿½u anki zamana gï¿½ncelle
             data.saveDate = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm");
 
             string updatedJson = JsonUtility.ToJson(data, true);
             File.WriteAllText(metaFile, updatedJson);
-            Debug.Log($"[AUTO-SAVE] {folderName} tarihi güncellendi: {data.saveDate}");
+            Debug.Log($"[AUTO-SAVE] {folderName} tarihi gï¿½ncellendi: {data.saveDate}");
         }
     }
 }

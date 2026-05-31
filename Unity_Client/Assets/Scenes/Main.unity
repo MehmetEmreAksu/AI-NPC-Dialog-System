@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: bfcb5ed5be8af2e428f1a9451293ad83, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: a47f42d427819204f80286836478cda4, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: d07684bdfe0e87444bbc2365844ca23f, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -267,6 +267,10 @@ PrefabInstance:
     - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_Name
       value: rpgpp_lt_cloud_02 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4457848601906800, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_RootOrder
@@ -1640,6 +1644,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_cloud_02 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4457848601906800, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -2426,6 +2434,10 @@ PrefabInstance:
     - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_Name
       value: rpgpp_lt_cloud_01 (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4675105466496168, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_RootOrder
@@ -4565,6 +4577,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1740991177}
     m_Modifications:
+    - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4457848601906800, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -4828,6 +4844,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_cloud_01 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4675105466496168, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -4897,6 +4917,10 @@ PrefabInstance:
     - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_Name
       value: rpgpp_lt_cloud_01 (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4675105466496168, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_RootOrder
@@ -5413,6 +5437,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_cloud_02 (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4457848601906800, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -5549,6 +5577,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1740991177}
     m_Modifications:
+    - target: {fileID: 1685426733795514, guid: f31c6bb6e68212e41b0bcae74612a240, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4538438218131234, guid: f31c6bb6e68212e41b0bcae74612a240, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -6006,6 +6038,10 @@ PrefabInstance:
     - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_Name
       value: rpgpp_lt_cloud_02 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4457848601906800, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_RootOrder
@@ -7879,6 +7915,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1740991177}
     m_Modifications:
+    - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4675105466496168, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -8540,6 +8580,10 @@ PrefabInstance:
     - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_Name
       value: rpgpp_lt_cloud_01 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4675105466496168, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_RootOrder
@@ -10007,6 +10051,10 @@ PrefabInstance:
     - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_Name
       value: rpgpp_lt_cloud_01 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4675105466496168, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_RootOrder
@@ -11739,6 +11787,7 @@ GameObject:
   - component: {fileID: 867313194}
   - component: {fileID: 867313193}
   - component: {fileID: 867313195}
+  - component: {fileID: 867313196}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -11820,7 +11869,7 @@ Transform:
   m_GameObject: {fileID: 867313192}
   serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: 64.75, y: 50, z: 49.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11855,6 +11904,29 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!114 &867313196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 867313192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adfe9d0e17dec224bb1b85a80d1c6e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DayNightCycle
+  dayDurationInSeconds: 120
+  currentTimePhase: Day
+  sunLight: {fileID: 867313193}
+  moonLight: {fileID: 937726772}
+  maxSunIntensity: 1
+  maxMoonIntensity: 0.5
+  dayAmbientColor: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+  nightAmbientColor: {r: 0.06, g: 0.07, b: 0.12, a: 1}
+  controlSkybox: 1
+  dayExposure: 1.3
+  nightExposure: 0.1
 --- !u!1 &867978179
 GameObject:
   m_ObjectHideFlags: 0
@@ -12919,6 +12991,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4063210846265680, guid: 186ecc7a1f977cc4fab5658c00fa3c4d, type: 3}
   m_PrefabInstance: {fileID: 931477589}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &937726770
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 937726773}
+  - component: {fileID: 937726772}
+  - component: {fileID: 937726771}
+  m_Layer: 0
+  m_Name: MoonLight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &937726771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937726770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!108 &937726772
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937726770}
+  m_Enabled: 1
+  serializedVersion: 11
+  m_Type: 1
+  m_Color: {r: 0.6273585, g: 0.67657524, b: 1, a: 1}
+  m_Intensity: 0
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 2
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!4 &937726773
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937726770}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalPosition: {x: 64.75, y: 50, z: 49.05}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1001 &938597600
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15332,6 +15531,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_cloud_01 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 1643322372839788, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4675105466496168, guid: 6fdeb1faa1b42904e9210dd047b256ba, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -17493,6 +17696,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4702229198241056, guid: 0ba258545da721e488ecb71ffd143b6f, type: 3}
   m_PrefabInstance: {fileID: 1323053255}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1324098962
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1324098964}
+  - component: {fileID: 1324098963}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1324098963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324098962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d51aa5f92f17f4d43b71472a025bddc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  guiltyNPC: 
+  suspectNPC: 
+  innocentNPC: 
+--- !u!4 &1324098964
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324098962}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 81.83022, y: 22.66296, z: 49.74848}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1325678252
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17809,6 +18059,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4607489187838822, guid: 00e2e59cbc04eab4a982218df54ce70b, type: 3}
   m_PrefabInstance: {fileID: 1359241910}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1376935381
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1376935383}
+  - component: {fileID: 1376935382}
+  m_Layer: 0
+  m_Name: PythonLauncher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1376935382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376935381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7b31863858a74a409076c287ec92eeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PythonLauncher
+--- !u!4 &1376935383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376935381}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 91.87052, y: 42.74931, z: 69.6587}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1382811773
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22755,6 +23049,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: rpgpp_lt_cloud_02 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4457848601906800, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -26796,7 +27094,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 21c2bd5977fe455449c7c21d5c512615, type: 3}
   - {fileID: 8300000, guid: 6fac5e2d690117044af001c7de3f8542, type: 3}
   myVoicePitch: 1
-  npcID: "T\xFCccar"
+  npcID: Tuccar
   voiceModel: austin
 --- !u!195 &1973709454
 NavMeshAgent:
@@ -27127,6 +27425,10 @@ PrefabInstance:
     - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_Name
       value: rpgpp_lt_cloud_02 (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1199571229238484, guid: f661498175107c749a33d97304c423eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4457848601906800, guid: f661498175107c749a33d97304c423eb, type: 3}
       propertyPath: m_RootOrder
@@ -30169,6 +30471,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 867313194}
+  - {fileID: 937726773}
   - {fileID: 1767446352}
   - {fileID: 1830574651}
   - {fileID: 1740991177}
@@ -30188,3 +30491,5 @@ SceneRoots:
   - {fileID: 38150881}
   - {fileID: 1612859011}
   - {fileID: 639283738}
+  - {fileID: 1324098964}
+  - {fileID: 1376935383}

@@ -130,7 +130,7 @@ def anilari_ozetle_ve_kaydet(player_id, npc_id,gecmis_liste):
 # 4. ANA MERKEZ: NPC MANTIĞI (Birleştirilmiş)
 # ==========================================
 # Fonksiyona 3 yeni parametre ekledik!
-def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice_model, npc_role, suspect_name, guilty_name):
+def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice_model, npc_role, suspect_name, guilty_name, time_of_day):
 
     hafiza_anahtari = f"{player_id}_{npc_id}"
     if hafiza_anahtari not in gecici_hafiza:
@@ -187,6 +187,12 @@ def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice
 
     print(f"[{npc_id} - Rol: {npc_role}] Yapay zeka dusunuyor (LLaMA 3.3)...")
 
+    day_night = ""
+    if time_of_day == "Night":
+        day_night = "It is currently NIGHT TIME. You are tired, sleepy, and easily irritated. You find it highly suspicious that the player is walking around in the dark. Tell them to go to sleep."
+    else:
+        day_night = "It is currently DAY TIME. You are awake and busy."
+
     try:
         chat_completion = client.chat.completions.create(
             messages=[
@@ -194,7 +200,8 @@ def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice
                     "role": "system",
                     "content": (
                         "You are an autonomous NPC in a modern RPG game. "
-                        f"Your character instructions: {gizli_talimat} "
+                        f"{day_night}"
+                        f"Your character instructions: {gizli_talimat}"
                         "React naturally and in-character. SPEAK IN PLAIN, MODERN ENGLISH. "
                         # BÜYÜ BURADA: JSON formatına "confess" aksiyonunu öğrettik!
                         "YOU MUST RESPOND STRICTLY IN THE FOLLOWING JSON FORMAT: "
@@ -288,6 +295,12 @@ def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice
 # 5. API UÇ NOKTALARI (ENDPOINTS)
 # ==========================================
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    # Unity tarafi sunucu hazir mi diye bunu yoklar. Hazirsa 200 doner.
+    return jsonify({"status": "ok"}), 200
+
+
 @app.route('/chat', methods=['POST'])
 def metin_etkilesimi_isle():
     if not request.is_json:
@@ -303,8 +316,9 @@ def metin_etkilesimi_isle():
     npc_role = gelen_veri.get('npc_role', 'Innocent')
     suspect_name = gelen_veri.get('suspect_name', 'Unknown')
     guilty_name = gelen_veri.get('guilty_name', 'Unknown')
+    time_of_day = gelen_veri.get('time_of_day', 'Day')  # Ses için request.form.get kullan
 
-    yanit, durum_kodu = npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice_model, npc_role, suspect_name, guilty_name)
+    yanit, durum_kodu = npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice_model, npc_role, suspect_name, guilty_name, time_of_day)
     return jsonify(yanit), durum_kodu
 
 
@@ -323,6 +337,7 @@ def sesli_etkilesimi_isle():
     npc_role = request.form.get('npc_role', 'Innocent')
     suspect_name = request.form.get('suspect_name', 'Unknown')
     guilty_name = request.form.get('guilty_name', 'Unknown')
+    time_of_day = request.form.get('time_of_day', 'Day')  # Ses için request.form.get kullan
 
     try:
         audio_content = ses_dosyasi.read()
@@ -338,7 +353,7 @@ def sesli_etkilesimi_isle():
             return jsonify(
                 {"npc_message": "What did you say?", "npc_emotion": "calm", "npc_action": "idle", "audio_url": ""}), 200
 
-        yanit, durum_kodu = npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice_model, npc_role, suspect_name, guilty_name)
+        yanit, durum_kodu = npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice_model, npc_role, suspect_name, guilty_name,time_of_day)
         return jsonify(yanit), durum_kodu
     except Exception as e:
         print(f"SES ÇEVİRİ HATASI: {e}")
