@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class NPCInteraction : MonoBehaviour, IInteractable
 {
@@ -29,5 +30,34 @@ public class NPCInteraction : MonoBehaviour, IInteractable
         {
             DialogSystem.Instance.StartChat(npcRoam); // npcRoam referansýný yolladýk!
         }
+
+        StartCoroutine(SmoothLookAt(player.transform, this.transform));
+    }
+
+    // KAYMAK GÝBÝ DÖNDÜREN KAMERA BÜYÜSÜ
+    private IEnumerator SmoothLookAt(Transform player, Transform npc)
+    {
+        Vector3 playerToNpc = (npc.position - player.position).normalized;
+        Vector3 npcToPlayer = (player.position - npc.position).normalized;
+
+        playerToNpc.y = 0f;
+        npcToPlayer.y = 0f;
+
+        Quaternion playerTargetRot = Quaternion.LookRotation(playerToNpc);
+        Quaternion npcTargetRot = Quaternion.LookRotation(npcToPlayer);
+
+        float time = 0f;
+        float duration = 0.5f; // Yarým saniyede usulca dönecekler
+
+        while (time < duration)
+        {
+            player.rotation = Quaternion.Slerp(player.rotation, playerTargetRot, time / duration);
+            npc.rotation = Quaternion.Slerp(npc.rotation, npcTargetRot, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        player.rotation = playerTargetRot;
+        npc.rotation = npcTargetRot;
     }
 }

@@ -12,15 +12,20 @@ public class NPC_Roam : MonoBehaviour
     private Vector3 startPosition;
 
     [Header("Voice Settings (Phrase Based)")]
-    public AudioClip[] myVoiceClips; // Adamýn 1-2 saniyelik cümle/mýrýldanma kayýtlarý
+    public AudioClip[] myVoiceClips; // Adamï¿½n 1-2 saniyelik cï¿½mle/mï¿½rï¿½ldanma kayï¿½tlarï¿½
     [Range(0.5f, 1.5f)] public float myVoicePitch = 0.8f;
 
-    // ÝÞTE BÝZÝM FREN ÞALTERÝMÝZ BU
+    // ï¿½ï¿½TE Bï¿½Zï¿½M FREN ï¿½ALTERï¿½Mï¿½Z BU
     private bool isTalkingMode = false;
 
     [Header("NPC Identity")]
     public string npcID = "Demirci";
     public string voiceModel = "troy";
+
+    [Header("Chase Settings (Kovalama)")]
+    private bool isChasing = false;
+    private Transform targetPlayer;
+    private string stolenItemName; // Ne ï¿½alï¿½ndï¿½ï¿½ï¿½nï¿½ aklï¿½nda tutsun ki laf edebilsin
 
     void Start()
     {
@@ -28,18 +33,58 @@ public class NPC_Roam : MonoBehaviour
         animator = GetComponent<Animator>();
         timer = waitTime;
         startPosition = transform.position;
+
+        // TESHIS: Bu NPC baked NavMesh (mavi alan) uzerinde mi? Degilse hic yuruyemez/kovalayamaz.
+        // Console'da hangi NPC'nin sorunlu oldugunu net soyler (orn: Demirci, yoldaki kadin...).
+        if (agent != null && !agent.isOnNavMesh)
+            Debug.LogWarning($"[NavMesh] '{npcID}' NavMesh uzerinde DEGIL! Bu yuzden takiliyor. " +
+                             "Onu mavi (baked) alanin uzerine tasi ve NavMeshSurface'i yeniden bake et.");
     }
 
     void Update()
     {
-        // AGA KÝLÝT NOKTA BURASI!
-        // Eðer konuþma modundaysak, alttaki yürüme kodlarýný HÝÇ OKUMA (Direkt çýk)
+        // AGA Kï¿½Lï¿½T NOKTA BURASI!
+        // Eï¿½er konuï¿½ma modundaysak, alttaki yï¿½rï¿½me kodlarï¿½nï¿½ Hï¿½ï¿½ OKUMA (Direkt ï¿½ï¿½k)
         if (isTalkingMode == true)
         {
             return;
         }
 
-        // --- NORMAL VOLTA ATMA KODLARI (Sadece konuþmuyorsak çalýþýr) ---
+        // --- KOVALAMA MODU ---
+        if (isChasing && targetPlayer != null)
+        {
+            // Adam kï¿½r gibi deï¿½il, NavMesh ï¿½zerinde gidebildiï¿½i en yakï¿½n noktaya koï¿½sun
+            UnityEngine.AI.NavMeshHit hit;
+            if (UnityEngine.AI.NavMesh.SamplePosition(targetPlayer.position, out hit, 3f, UnityEngine.AI.NavMesh.AllAreas))
+            {
+                agent.SetDestination(hit.position);
+            }
+            else
+            {
+                agent.SetDestination(targetPlayer.position);
+            }
+
+            // Yakalama mesafesini 2.5'ten 3.5'e ï¿½ï¿½kardï¿½k. 
+            // Bï¿½ylece sen ufak bir taï¿½a ï¿½ï¿½ksan bile NPC dibine gelince seni ensenden yakalayabilir!
+            if (Vector3.Distance(transform.position, targetPlayer.position) <= 2.5f)
+            {
+                isChasing = false;
+                agent.speed = 3.5f;
+                PrepareForDialog();
+
+                if (DialogSystem.Instance != null)
+                {
+                    // 1. Arayï¿½zï¿½ aï¿½ ve karakteri dondur
+                    DialogSystem.Instance.StartChat(this);
+
+                    // 2. Anï¿½nda dï¿½nmek yerine Smooth kamerayï¿½ tetikle!
+                    StartCoroutine(CatchAndTurnSmoothly());
+                }
+            }
+            return;
+        }
+
+        // --- NORMAL VOLTA ATMA KODLARI (Sadece konuï¿½muyorsak ï¿½alï¿½ï¿½ï¿½r) ---
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
             timer += Time.deltaTime;
@@ -69,37 +114,37 @@ public class NPC_Roam : MonoBehaviour
     }
 
     // =================================================================
-    // DÝALOG BAÞLADIÐINDA VE BÝTTÝÐÝNDE ÇALIÞACAK SÝHÝRLÝ FONKSÝYONLAR
+    // Dï¿½ALOG BAï¿½LADIï¿½INDA VE Bï¿½TTï¿½ï¿½ï¿½NDE ï¿½ALIï¿½ACAK Sï¿½Hï¿½RLï¿½ FONKSï¿½YONLAR
     // =================================================================
 
 
-    // 1. E'ye basýldýðýnda adamý dondurup sana baktýracak fonksiyon
+    // 1. E'ye basï¿½ldï¿½ï¿½ï¿½nda adamï¿½ dondurup sana baktï¿½racak fonksiyon
     public void PrepareForDialog()
     {
-        isTalkingMode = true;       // Volta atmayý kes
-        agent.isStopped = true;     // Yere çivilen
+        isTalkingMode = true;       // Volta atmayï¿½ kes
+        agent.isStopped = true;     // Yere ï¿½ivilen
         agent.velocity = Vector3.zero;
 
         animator.SetBool("isWalking", false);
         animator.SetBool("isTalking", false); // Sadece IDLE durup beklesin
     }
 
-    // 2. Python'dan cevap geldiðinde (veya bittiðinde) elleri oynatacak fonksiyon
+    // 2. Python'dan cevap geldiï¿½inde (veya bittiï¿½inde) elleri oynatacak fonksiyon
     public void SetTalkingAnimation(bool isTalkingMode, string emotion)
     {
         if (isTalkingMode)
         {
-            // ZIRH 1: Önceki sohbetten kalan trigger'larý temizle
+            // ZIRH 1: ï¿½nceki sohbetten kalan trigger'larï¿½ temizle
             animator.ResetTrigger("angry");
             animator.ResetTrigger("suspicious");
             animator.ResetTrigger("defeated");
             animator.ResetTrigger("terrified");
 
-            // BÜYÜ BURADA: Eðer özel bir duygu varsa normal isTalking'i EZÝYORUZ!
+            // Bï¿½Yï¿½ BURADA: Eï¿½er ï¿½zel bir duygu varsa normal isTalking'i EZï¿½YORUZ!
             switch (emotion)
             {
                 case "angry":
-                    animator.SetBool("isTalking", false); // Normal konuþmayý kapa!
+                    animator.SetBool("isTalking", false); // Normal konuï¿½mayï¿½ kapa!
                     animator.SetTrigger("angry");         // Duyguyu patlat!
                     break;
                 case "suspicious":
@@ -116,28 +161,76 @@ public class NPC_Roam : MonoBehaviour
                     break;
                 case "calm":
                 default:
-                    // SADECE "calm" geldiðinde normal konuþma þalterini kaldýr.
+                    // SADECE "calm" geldiï¿½inde normal konuï¿½ma ï¿½alterini kaldï¿½r.
                     animator.SetBool("isTalking", true);
                     break;
             }
         }
         else
         {
-            // Sohbet tamamen bitti (ESC'ye basýldý)
+            // Sohbet tamamen bitti (ESC'ye basï¿½ldï¿½)
             animator.SetBool("isTalking", false);
 
-            // ZIRH 2: Adamýn korkusu veya siniri yüzünde takýlý kalmasýn diye ZORLA Idle'a döndür.
-            animator.Play("Idle"); // Kendi idle animasyonunun adýný buraya yaz (Örn: "Idle_A")
+            // ZIRH 2: Adamï¿½n korkusu veya siniri yï¿½zï¿½nde takï¿½lï¿½ kalmasï¿½n diye ZORLA Idle'a dï¿½ndï¿½r.
+            animator.Play("Idle"); // Kendi idle animasyonunun adï¿½nï¿½ buraya yaz (ï¿½rn: "Idle_A")
         }
     }
 
-    // 3. Sohbet tamamen bitip ESC'ye basýldýðýnda çalýþacak fonksiyon
+    // 3. Sohbet tamamen bitip ESC'ye basï¿½ldï¿½ï¿½ï¿½nda ï¿½alï¿½ï¿½acak fonksiyon
     public void EndDialog()
     {
-        isTalkingMode = false;      // Volta atmaya geri dön
+        isTalkingMode = false;      // Volta atmaya geri dï¿½n
         animator.SetBool("isTalking", false);
-        agent.isStopped = false;    // Tasmasýný çöz
+        agent.isStopped = false;    // Tasmasï¿½nï¿½ ï¿½ï¿½z
         timer = waitTime;
+    }
+
+    public void StartChasingPlayer(string item, Transform playerTransform)
+    {
+        isTalkingMode = false; // Konuï¿½ma modundaysa ï¿½ï¿½k
+        isChasing = true;      // Avcï¿½ modunu aï¿½!
+        stolenItemName = item;
+        targetPlayer = playerTransform;
+
+        agent.isStopped = false;
+        agent.speed = 5f; // AGA ADAM Sï¿½Nï¿½RLï¿½, HIZLI KOï¿½SUN! (Normal hï¿½zï¿½ 3 ise bunu 5 yap)
+        animator.SetBool("isWalking", true);
+    }
+
+    private System.Collections.IEnumerator CatchAndTurnSmoothly()
+    {
+        float time = 0f;
+        float duration = 0.4f; // Saniyenin yarï¿½sï¿½nda kaymak gibi dï¿½necek
+
+        // Birbirinize bakacaï¿½ï¿½nï¿½z yï¿½nleri hesapla
+        Vector3 playerToNpc = (transform.position - targetPlayer.position).normalized;
+        Vector3 npcToPlayer = (targetPlayer.position - transform.position).normalized;
+
+        playerToNpc.y = 0f; // Kafalar havaya kalkmasï¿½n
+        npcToPlayer.y = 0f;
+
+        Quaternion playerTargetRot = Quaternion.LookRotation(playerToNpc);
+        Quaternion npcTargetRot = Quaternion.LookRotation(npcToPlayer);
+
+        // Smooth dï¿½nï¿½ï¿½ dï¿½ngï¿½sï¿½
+        while (time < duration)
+        {
+            targetPlayer.rotation = Quaternion.Slerp(targetPlayer.rotation, playerTargetRot, time / duration);
+            transform.rotation = Quaternion.Slerp(transform.rotation, npcTargetRot, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        // Tam hizala
+        targetPlayer.rotation = playerTargetRot;
+        transform.rotation = npcTargetRot;
+
+        // Dï¿½Nï¿½ï¿½ Bï¿½TTï¿½KTEN SONRA Python'a "Beni yakaladï¿½" kargosunu yolla!
+        if (NetworkManager.Instance != null)
+        {
+            string thePrompt = $"I just STOLE the {stolenItemName} right in front of your eyes!";
+            NetworkManager.Instance.SendMessageToServer("", npcID, thePrompt, voiceModel);
+        }
     }
 }
 

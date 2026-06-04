@@ -9,6 +9,10 @@ public class DialogSystem : MonoBehaviour
     // Singleton instance for global access
     public static DialogSystem Instance { get; private set; }
 
+    // Diyalog su an ekranda acik mi? PauseMenuController bunu kontrol eder:
+    // diyalogdayken ESC pause menusunu ACMAZ, diyalogu kapatir.
+    public bool IsDialogOpen => dialogPanel != null && dialogPanel.activeSelf;
+
     [Header("UI Elements")]
     public GameObject dialogPanel;
     public TextMeshProUGUI npcText;
@@ -24,7 +28,7 @@ public class DialogSystem : MonoBehaviour
     public float typingSpeed = 0.03f;
 
     [Header("Voice Settings")]
-    public string micDeviceName; // Boþ býrakýrsan varsayýlan mikrofonu seçer
+    public string micDeviceName; // Boï¿½ bï¿½rakï¿½rsan varsayï¿½lan mikrofonu seï¿½er
     private AudioClip recordedClip;
     private bool isRecording = false;
     private float recordingStartTime;
@@ -67,21 +71,23 @@ public class DialogSystem : MonoBehaviour
                 SendPlayerMessage();
             }
 
-            // --- YENÝ: BAS KONUÞ SÝSTEMÝ (V TUÞU) ---
+            // --- YENï¿½: BAS KONUï¿½ Sï¿½STEMï¿½ (V TUï¿½U) ---
             if (Keyboard.current != null)
             {
-                // alt tuþuna BASMAYA BAÞLADIÐINDA
+                // alt tuï¿½una BASMAYA BAï¿½LADIï¿½INDA
                 if (Keyboard.current.altKey.wasPressedThisFrame && !isRecording)
                 {
                     StartRecordingVoice();
                 }
 
-                // alt tuþundan ELÝNÝ ÇEKTÝÐÝNDE
+                // alt tuï¿½undan ELï¿½Nï¿½ ï¿½EKTï¿½ï¿½ï¿½NDE
                 if (Keyboard.current.altKey.wasReleasedThisFrame && isRecording)
                 {
                     StopRecordingAndSendVoice();
                 }
             }
+            // NOT: ESC artik burada degil, tek elden PauseMenuController'da yonetiliyor.
+            // (Ayni frame'de hem diyalog kapanip hem pause acilma yarisini onlemek icin.)
         }
     }
 
@@ -107,17 +113,17 @@ public class DialogSystem : MonoBehaviour
         playerInput.ActivateInputField();
     }
 
-    // Mikrofonu Baþlat
+    // Mikrofonu Baï¿½lat
     private void StartRecordingVoice()
     {
         isRecording = true;
         recordingStartTime = Time.time;
 
-        // Ekrana havalý bir bilgi verelim
+        // Ekrana havalï¿½ bir bilgi verelim
         playerInput.text = "";
-        npcText.text = "<color=red>?? Dinleniyor... (Konuþ ve V'yi býrak)</color>";
+        npcText.text = "<color=red>?? Dinleniyor... (Konuï¿½ ve V'yi bï¿½rak)</color>";
 
-        // Cihazýn varsayýlan mikrofonunu 15 saniyeliðine dinlemeye baþla (44100 Hz standart kalitedir)
+        // Cihazï¿½n varsayï¿½lan mikrofonunu 15 saniyeliï¿½ine dinlemeye baï¿½la (44100 Hz standart kalitedir)
         recordedClip = Microphone.Start(micDeviceName, false, 15, 44100);
     }
 
@@ -128,20 +134,20 @@ public class DialogSystem : MonoBehaviour
 
         float duration = Time.time - recordingStartTime;
 
-        // 1 saniyeden az bas-çek yaptýysa iptal et (Kazara basmalarý engeller)
+        // 1 saniyeden az bas-ï¿½ek yaptï¿½ysa iptal et (Kazara basmalarï¿½ engeller)
         if (duration < 1.0f)
         {
-            npcText.text = "Dinleme iptal edildi. Çok kýsa konuþtun.";
+            npcText.text = "Dinleme iptal edildi. ï¿½ok kï¿½sa konuï¿½tun.";
             return;
         }
 
-        npcText.text = "<color=yellow>? Ses Python'a gönderiliyor, bekle...</color>";
+        npcText.text = "<color=yellow>? Ses Python'a gï¿½nderiliyor, bekle...</color>";
         playerInput.gameObject.SetActive(false);
 
-        // O yazdýðýmýz çevirici sýnýf ile sesi byte dizisine (.wav) çevir
+        // O yazdï¿½ï¿½ï¿½mï¿½z ï¿½evirici sï¿½nï¿½f ile sesi byte dizisine (.wav) ï¿½evir
         byte[] wavData = WavUtility.FromAudioClip(recordedClip);
 
-        // NetworkManager'a metin deðil, SES byte dizisini gönder diyoruz!
+        // NetworkManager'a metin deï¿½il, SES byte dizisini gï¿½nder diyoruz!
         if (NetworkManager.Instance != null)
         {
             NetworkManager.Instance.SendVoiceToServer(wavData, currentNPC.npcID, currentPlayerAction, currentNPC.voiceModel);
@@ -179,49 +185,49 @@ public class DialogSystem : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // BÜYÜ BURADA: Konuþtuðumuz adama "Bak kardeþim metin geldi, duygun da þu" diyoruz.
+        // Bï¿½Yï¿½ BURADA: Konuï¿½tuï¿½umuz adama "Bak kardeï¿½im metin geldi, duygun da ï¿½u" diyoruz.
         if (currentNPC != null)
         {
             currentNPC.SetTalkingAnimation(true, emotion);
         }
 
-        //ses çalma
+        //ses ï¿½alma
         if(voiceClip != null && dialogAudioSource != null)
         {
             dialogAudioSource.clip = voiceClip;
-            dialogAudioSource.pitch = 1f; // Gerçek ses olduðu için pitch'i bozmuyoruz
-            dialogAudioSource.loop = false; // Tek seferlik çalacak
+            dialogAudioSource.pitch = 1f; // Gerï¿½ek ses olduï¿½u iï¿½in pitch'i bozmuyoruz
+            dialogAudioSource.loop = false; // Tek seferlik ï¿½alacak
             dialogAudioSource.Play();
         }
         else
         {
-            Debug.LogWarning("<color=red>DÝKKAT: voiceClip veya dialogAudioSource NULL (Boþ) geldi!</color>");
+            Debug.LogWarning("<color=red>Dï¿½KKAT: voiceClip veya dialogAudioSource NULL (Boï¿½) geldi!</color>");
         }
 
         StartCoroutine(TypewriterEffect(message, voiceClip));
     }
 
     // Displays text character by character
-    // 3. Yazý Hýzýný Senkronize Eden Yeni Typewriter
-    // 3. Yazý Hýzýný Senkronize Eden Yeni ve ZIRHLI Typewriter
+    // 3. Yazï¿½ Hï¿½zï¿½nï¿½ Senkronize Eden Yeni Typewriter
+    // 3. Yazï¿½ Hï¿½zï¿½nï¿½ Senkronize Eden Yeni ve ZIRHLI Typewriter
     private IEnumerator TypewriterEffect(string text, AudioClip voiceClip)
     {
         isNpcSpeaking = true;
         playerInput.gameObject.SetActive(false);
         npcText.text = "";
 
-        // Varsayýlan güvenli hýzýmýzý alýyoruz
+        // Varsayï¿½lan gï¿½venli hï¿½zï¿½mï¿½zï¿½ alï¿½yoruz
         float calculatedSpeed = typingSpeed;
 
-        // AGA BÜYÜ BURADA: Unity'nin saçmalamasýný (NaN veya 0 dönmesini) engelliyoruz
+        // AGA Bï¿½Yï¿½ BURADA: Unity'nin saï¿½malamasï¿½nï¿½ (NaN veya 0 dï¿½nmesini) engelliyoruz
         if (voiceClip != null && text.Length > 0 && voiceClip.length > 0.1f)
         {
             calculatedSpeed = (voiceClip.length - 0.1f) / text.Length;
         }
 
-        // ZIRH: Eðer Unity'nin matematiði çýldýrýrsa diye HIZ KORÝDORU çekiyoruz!
-        // Hýz asla 0.01'den hýzlý, 0.06'dan yavaþ OLAMAYACAK. 
-        // Böylece ilk harfte takýlýp sonsuza kadar bekleme bug'ý tarihe karýþacak.
+        // ZIRH: Eï¿½er Unity'nin matematiï¿½i ï¿½ï¿½ldï¿½rï¿½rsa diye HIZ KORï¿½DORU ï¿½ekiyoruz!
+        // Hï¿½z asla 0.01'den hï¿½zlï¿½, 0.06'dan yavaï¿½ OLAMAYACAK. 
+        // Bï¿½ylece ilk harfte takï¿½lï¿½p sonsuza kadar bekleme bug'ï¿½ tarihe karï¿½ï¿½acak.
         calculatedSpeed = Mathf.Clamp(calculatedSpeed, 0.01f, 0.06f);
 
         foreach (char letter in text.ToCharArray())
@@ -230,7 +236,7 @@ public class DialogSystem : MonoBehaviour
             yield return new WaitForSeconds(calculatedSpeed);
         }
 
-        // Yazý bitti, Animator'ý sýfýrla (Eðer adam o sýrada ölmediyse/yok olmadýysa)
+        // Yazï¿½ bitti, Animator'ï¿½ sï¿½fï¿½rla (Eï¿½er adam o sï¿½rada ï¿½lmediyse/yok olmadï¿½ysa)
         if (currentNPC != null)
         {
             currentNPC.SetTalkingAnimation(false, "calm");
@@ -243,26 +249,26 @@ public class DialogSystem : MonoBehaviour
 
     //    private IEnumerator HandleVoicePhrases()
     //    {
-    //        // Eðer adamýn kaseti yoksa veya boþsa hiç çalýþma
+    //        // Eï¿½er adamï¿½n kaseti yoksa veya boï¿½sa hiï¿½ ï¿½alï¿½ï¿½ma
     //        if (currentNPC == null || currentNPC.myVoiceClips.Length == 0 || dialogAudioSource == null)
     //        {
     //            yield break;
     //        }
     //        int lastPlayedIndex = -1;
-    //        // Metin akmaya devam ettiði sürece (isNpcSpeaking true olduðu sürece) bu döngü dönecek
+    //        // Metin akmaya devam ettiï¿½i sï¿½rece (isNpcSpeaking true olduï¿½u sï¿½rece) bu dï¿½ngï¿½ dï¿½necek
     //        while (isNpcSpeaking)
     //        {
-    //            // Eðer hoparlör o an sessizse (Yani çaldýðý kaset bittiyse)
+    //            // Eï¿½er hoparlï¿½r o an sessizse (Yani ï¿½aldï¿½ï¿½ï¿½ kaset bittiyse)
     //            if (!dialogAudioSource.isPlaying)
     //            {
-    //                // Rastgele bir kaset seç
+    //                // Rastgele bir kaset seï¿½
     //                int randomIndex = Random.Range(0, currentNPC.myVoiceClips.Length);
     //
     //                if (currentNPC.myVoiceClips.Length > 1)
     //                {
     //                    while (randomIndex == lastPlayedIndex)
     //                    {
-    //                        // Ayný kaset denk geldikçe yeniden zar at! (Farklýyý bulana kadar döner)
+    //                        // Aynï¿½ kaset denk geldikï¿½e yeniden zar at! (Farklï¿½yï¿½ bulana kadar dï¿½ner)
     //                        randomIndex = Random.Range(0, currentNPC.myVoiceClips.Length);
     //                    }
     //                }
@@ -271,19 +277,19 @@ public class DialogSystem : MonoBehaviour
     //
     //                dialogAudioSource.clip = currentNPC.myVoiceClips[randomIndex];
     //
-    //                // Robotikliði kýrmak için pitch ile milimetrik oyna
+    //                // Robotikliï¿½i kï¿½rmak iï¿½in pitch ile milimetrik oyna
     //                dialogAudioSource.pitch = currentNPC.myVoicePitch + Random.Range(-0.03f, 0.03f);
     //
-    //                // Yeni kaseti çalmaya baþla!
+    //                // Yeni kaseti ï¿½almaya baï¿½la!
     //                dialogAudioSource.Play();
     //            }
     //
-    //            // Frame atla ve hoparlörün bitip bitmediðini kontrol etmeye devam et
+    //            // Frame atla ve hoparlï¿½rï¿½n bitip bitmediï¿½ini kontrol etmeye devam et
     //            yield return null;
     //        }
     //
     //        // isNpcSpeaking false oldu (Metin tamamen bitti). 
-    //        // Adamýn cümlesi yarým kalmýþ olsa bile sesi anýnda þak diye kes!
+    //        // Adamï¿½n cï¿½mlesi yarï¿½m kalmï¿½ï¿½ olsa bile sesi anï¿½nda ï¿½ak diye kes!
     //        if (dialogAudioSource != null)
     //        {
     //            dialogAudioSource.Stop();
@@ -304,11 +310,11 @@ public class DialogSystem : MonoBehaviour
         if (zoomCoroutine != null) StopCoroutine(zoomCoroutine);
         zoomCoroutine = StartCoroutine(SmoothCameraZoom(normalFOV));
 
-        // DEÐÝÞÝKLÝK 4: Konuþma tamamen bitti (ESC'ye basýldý). Adam yürümeye devam etsin!
+        // DEï¿½ï¿½ï¿½ï¿½KLï¿½K 4: Konuï¿½ma tamamen bitti (ESC'ye basï¿½ldï¿½). Adam yï¿½rï¿½meye devam etsin!
         if (currentNPC != null)
         {
             currentNPC.EndDialog();
-            currentNPC = null; // Hafýzayý temizle
+            currentNPC = null; // Hafï¿½zayï¿½ temizle
         }
     }
 

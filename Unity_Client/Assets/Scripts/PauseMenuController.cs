@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem; // <-- YENÝ ÝSÝSTEM KÜTÜPHANESÝ EKLENDÝ
+using UnityEngine.InputSystem; // <-- YENï¿½ ï¿½Sï¿½STEM Kï¿½Tï¿½PHANESï¿½ EKLENDï¿½
 
 public class PauseMenuController : MonoBehaviour
 {
-    [Header("Menü Panelleri")]
+    [Header("Menï¿½ Panelleri")]
     public GameObject pauseMenuPanel;
     public GameObject settingsPanel;
 
@@ -19,13 +19,20 @@ public class PauseMenuController : MonoBehaviour
 
     void Update()
     {
-        // YENÝ INPUT SÝSTEMÝNE GÖRE ESC TUÞU KONTROLÜ
+        // YENI INPUT SISTEMINE GORE ESC TUSU KONTROLU (tek elden)
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
-            if (isPaused)
+            // 1) Diyalog acikken ESC -> pause ACMA, sadece diyalogu kapat.
+            if (DialogSystem.Instance != null && DialogSystem.Instance.IsDialogOpen)
+            {
+                DialogSystem.Instance.StopDialog();
+            }
+            // 2) Zaten pause'daysak -> oyuna don.
+            else if (isPaused)
             {
                 ResumeGame();
             }
+            // 3) Diyalog yok, pause da yok -> pause menusunu ac.
             else
             {
                 PauseGame();
@@ -33,7 +40,7 @@ public class PauseMenuController : MonoBehaviour
         }
     }
 
-    // --- BUTON FONKSÝYONLARI ---
+    // --- BUTON FONKSï¿½YONLARI ---
 
     public void ResumeGame()
     {
@@ -41,7 +48,7 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         isPaused = false;
 
-        // Oyuna dönerken fareyi tekrar gizle ve merkeze kilitle
+        // Oyuna dï¿½nerken fareyi tekrar gizle ve merkeze kilitle
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -52,21 +59,21 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 0f;
         isPaused = true;
 
-        // Menü açýlýrken fareyi GÖRÜNÜR yap ve kilidini AÇ
+        // Menï¿½ aï¿½ï¿½lï¿½rken fareyi Gï¿½Rï¿½Nï¿½R yap ve kilidini Aï¿½
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
     public void OpenSettings()
     {
-        pauseMenuPanel.SetActive(false); // Pause menüsünü gizle
-        settingsPanel.SetActive(true);   // Ayarlarý göster
+        pauseMenuPanel.SetActive(false); // Pause menï¿½sï¿½nï¿½ gizle
+        settingsPanel.SetActive(true);   // Ayarlarï¿½ gï¿½ster
     }
 
     public void CloseSettings()
     {
-        settingsPanel.SetActive(false);  // Ayarlarý gizle
-        pauseMenuPanel.SetActive(true);  // Pause menüsüne geri dön
+        settingsPanel.SetActive(false);  // Ayarlarï¿½ gizle
+        pauseMenuPanel.SetActive(true);  // Pause menï¿½sï¿½ne geri dï¿½n
     }
 
     public void ReturnToMainMenu()
@@ -74,13 +81,13 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         isPaused = false;
 
-        Debug.Log("Kayýt alýndý. Ana Menüye dönülüyor...");
+        Debug.Log("Kayï¿½t alï¿½ndï¿½. Ana Menï¿½ye dï¿½nï¿½lï¿½yor...");
         SceneManager.LoadScene("MainMenu");
     }
 
     public void QuitToDesktop()
     {
-        Debug.Log("Kayýt alýndý. Masaüstüne çýkýlýyor...");
+        Debug.Log("Kayï¿½t alï¿½ndï¿½. Masaï¿½stï¿½ne ï¿½ï¿½kï¿½lï¿½yor...");
         Application.Quit();
     }
 }
