@@ -43,7 +43,7 @@ public class NetworkManager : MonoBehaviour
         Instance = this;
     }
 
-    // AGA BÜYÜ BURADA: Fonksiyon parametreleri eskisi gibi temiz (sadece 4 tane)!
+    // AGA Bï¿½Yï¿½ BURADA: Fonksiyon parametreleri eskisi gibi temiz (sadece 4 tane)!
     public void SendMessageToServer(string message, string npcId, string action, string voiceModel)
     {
         StartCoroutine(PostRequest(message, npcId, action, voiceModel));
@@ -57,7 +57,7 @@ public class NetworkManager : MonoBehaviour
         requestData.npc_id = npcId;
         requestData.voice_model = voiceModel;
 
-        // VERÝYÝ ELDEN TAÞIMIYORUZ, DÝREKT MERKEZDEN ÇEKÝYORUZ!
+        // VERï¿½Yï¿½ ELDEN TAï¿½IMIYORUZ, Dï¿½REKT MERKEZDEN ï¿½EKï¿½YORUZ!
         if (GameManager.Instance != null)
         {
             requestData.npc_role = GameManager.Instance.GetNpcRole(npcId);
@@ -95,6 +95,10 @@ public class NetworkManager : MonoBehaviour
 
             APIResponseData responseData = JsonUtility.FromJson<APIResponseData>(jsonResponse);
 
+            // Suclu itiraf ettiyse (npc_action == "confess") kuyudaki item'i ortaya cikar.
+            if (responseData != null && responseData.npc_action == "confess" && EndGameManager.Instance != null)
+                EndGameManager.Instance.OnConfession();
+
             if (DialogSystem.Instance != null && responseData != null)
             {
                 string receivedEmotion = string.IsNullOrEmpty(responseData.npc_emotion) ? "calm" : responseData.npc_emotion.ToLower();
@@ -111,7 +115,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    // SES FONKSÝYONU: Parametreleri yine temiz tuttuk!
+    // SES FONKSï¿½YONU: Parametreleri yine temiz tuttuk!
     public void SendVoiceToServer(byte[] voiceData, string npcId, string action, string voiceModel)
     {
         StartCoroutine(PostVoiceRequest(voiceData, npcId, action, voiceModel));
@@ -127,7 +131,7 @@ public class NetworkManager : MonoBehaviour
         form.AddField("player_action", action);
         form.AddField("voice_model", voiceModel);
 
-        // MERKEZDEN GÝZLÝCE ÇEKÝP FORMA EKLÝYORUZ!
+        // MERKEZDEN Gï¿½ZLï¿½CE ï¿½EKï¿½P FORMA EKLï¿½YORUZ!
         if (GameManager.Instance != null)
         {
             form.AddField("npc_role", GameManager.Instance.GetNpcRole(npcId));
@@ -146,16 +150,20 @@ public class NetworkManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
-            Debug.LogError("Ses Gönderme Hatasý: " + request.error);
+            Debug.LogError("Ses Gï¿½nderme Hatasï¿½: " + request.error);
             if (DialogSystem.Instance != null)
-                DialogSystem.Instance.ReceiveResponse("Seni duyamadým, baðlantý koptu.", "", null);
+                DialogSystem.Instance.ReceiveResponse("Seni duyamadï¿½m, baï¿½lantï¿½ koptu.", "", null);
         }
         else
         {
             string jsonResponse = request.downloadHandler.text;
-            Debug.Log("<color=cyan>SES CEVABI GELDÝ: </color>" + jsonResponse);
+            Debug.Log("<color=cyan>SES CEVABI GELDï¿½: </color>" + jsonResponse);
 
             APIResponseData responseData = JsonUtility.FromJson<APIResponseData>(jsonResponse);
+
+            // Suclu itiraf ettiyse (npc_action == "confess") kuyudaki item'i ortaya cikar.
+            if (responseData != null && responseData.npc_action == "confess" && EndGameManager.Instance != null)
+                EndGameManager.Instance.OnConfession();
 
             if (DialogSystem.Instance != null && responseData != null)
             {
@@ -192,11 +200,11 @@ public class NetworkManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("<color=orange>[*] Sohbet bitti sinyali Python'a ulaþtý. Hafýza özetleniyor.</color>");
+            Debug.Log("<color=orange>[*] Sohbet bitti sinyali Python'a ulaï¿½tï¿½. Hafï¿½za ï¿½zetleniyor.</color>");
         }
         else
         {
-            Debug.LogError("End Chat sinyali gönderilemedi: " + request.error);
+            Debug.LogError("End Chat sinyali gï¿½nderilemedi: " + request.error);
         }
     }
 
@@ -212,7 +220,7 @@ public class NetworkManager : MonoBehaviour
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
-                Debug.LogError("Ses indirme hatasý: " + www.error);
+                Debug.LogError("Ses indirme hatasï¿½: " + www.error);
                 DialogSystem.Instance.ReceiveResponse(message, emotion, null);
             }
             else
@@ -220,6 +228,29 @@ public class NetworkManager : MonoBehaviour
                 AudioClip downloadedClip = DownloadHandlerAudioClip.GetContent(www);
                 DialogSystem.Instance.ReceiveResponse(message, emotion, downloadedClip);
             }
+        }
+    }
+
+    // AGA BÃœYÃœ BURADA: Unity kapanÄ±rken Coroutine'ler anÄ±nda durur. 
+    // Bu yÃ¼zden "yield return" KULLANMADAN direkt paketi ateÅŸleyip bÄ±rakÄ±yoruz.
+    // AGA BÃœYÃœ BURADA: Asenkron yerine SENKRON istek atÄ±yoruz. Oyun kapanmadan Ã¶nce zorla bekler.
+    public void SendShutdownSignal()
+    {
+        try
+        {
+            System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create("http://127.0.0.1:8000/shutdown");
+            request.Method = "POST";
+            request.Timeout = 1000; // En fazla 1 saniye bekle
+
+            // YanÄ±tÄ± bekle ki paketin PC'den Ã§Ä±ktÄ±ÄŸÄ±na %100 emin olalÄ±m
+            using (System.Net.WebResponse response = request.GetResponse())
+            {
+                Debug.Log("<color=orange>[*] Kapanma (Shutdown) sinyali kesin olarak Python'a ulasti.</color>");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("Shutdown sinyali atilirken hata (Zaten kapanmis olabilir): " + e.Message);
         }
     }
 }

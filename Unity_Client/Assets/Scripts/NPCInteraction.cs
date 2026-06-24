@@ -3,6 +3,8 @@ using System.Collections;
 
 public class NPCInteraction : MonoBehaviour, IInteractable
 {
+    public string GetPrompt() => "[E] Konus";
+
     public void Interact()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -13,28 +15,28 @@ public class NPCInteraction : MonoBehaviour, IInteractable
             return;
         }
 
-        // 1. Adama sana dönmesini söyle
+        // 1. Adama sana dï¿½nmesini sï¿½yle
         Vector3 lookDirection = player.transform.position - transform.position;
         lookDirection.y = 0f;
         transform.rotation = Quaternion.LookRotation(lookDirection);
 
-        // 2. ADAM YÜRÜYORSA DURDUR (NPC_Roam'u bul ve beklemesini söyle)
+        // 2. ADAM Yï¿½Rï¿½YORSA DURDUR (NPC_Roam'u bul ve beklemesini sï¿½yle)
         NPC_Roam npcRoam = GetComponent<NPC_Roam>();
         if (npcRoam != null)
         {
             npcRoam.PrepareForDialog();
         }
 
-        // 3. Dialog sistemine "Þu an bu NPC ile konuþuyorum" bilgisini gönder
+        // 3. Dialog sistemine "ï¿½u an bu NPC ile konuï¿½uyorum" bilgisini gï¿½nder
         if (DialogSystem.Instance != null)
         {
-            DialogSystem.Instance.StartChat(npcRoam); // npcRoam referansýný yolladýk!
+            DialogSystem.Instance.StartChat(npcRoam); // npcRoam referansï¿½nï¿½ yolladï¿½k!
         }
 
         StartCoroutine(SmoothLookAt(player.transform, this.transform));
     }
 
-    // KAYMAK GÝBÝ DÖNDÜREN KAMERA BÜYÜSÜ
+    // KAYMAK Gï¿½Bï¿½ Dï¿½NDï¿½REN KAMERA Bï¿½Yï¿½Sï¿½
     private IEnumerator SmoothLookAt(Transform player, Transform npc)
     {
         Vector3 playerToNpc = (npc.position - player.position).normalized;
@@ -47,7 +49,7 @@ public class NPCInteraction : MonoBehaviour, IInteractable
         Quaternion npcTargetRot = Quaternion.LookRotation(npcToPlayer);
 
         float time = 0f;
-        float duration = 0.5f; // Yarým saniyede usulca dönecekler
+        float duration = 0.5f; // Yarï¿½m saniyede usulca dï¿½necekler
 
         while (time < duration)
         {

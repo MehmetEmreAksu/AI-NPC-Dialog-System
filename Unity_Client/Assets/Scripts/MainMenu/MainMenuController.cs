@@ -39,6 +39,11 @@ public class MainMenuController : MonoBehaviour
 
         Debug.Log($"[NEW GAME] Yeni kay�t olu�turuldu: {folderName}. Python'a ba�lan�l�yor...");
 
+        // GameManager'a "bu YENI oyun, su klasore ait" bilgisini birak.
+        PlayerPrefs.SetString(GameManager.PREF_ACTIVE_SAVE, folderName);
+        PlayerPrefs.SetInt(GameManager.PREF_IS_NEW_GAME, 1);
+        PlayerPrefs.Save();
+
         // 3. Python'a bildir ve as�l oyuna gir
         StartCoroutine(SendNewGameRequestToPython(folderName));
     }

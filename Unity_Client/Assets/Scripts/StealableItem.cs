@@ -1,22 +1,24 @@
 using UnityEngine;
 
-// Senin o müthiþ IInteractable arayüzünü kullanýyoruz!
+// Senin o mï¿½thiï¿½ IInteractable arayï¿½zï¿½nï¿½ kullanï¿½yoruz!
 public class StealableItem : MonoBehaviour, IInteractable
 {
-    [Header("Eþya Bilgileri")]
-    public string itemName = "Sacred Silver Goblet"; // Llama'nýn eþyanýn ne olduðunu anlamasý için Ýngilizce isim
+    [Header("Eï¿½ya Bilgileri")]
+    public string itemName = "Sacred Silver Goblet"; // Llama'nï¿½n eï¿½yanï¿½n ne olduï¿½unu anlamasï¿½ iï¿½in ï¿½ngilizce isim
 
-    [Header("Yakalanma Ayarlarý")]
-    public float detectionRadius = 15f; // NPC'lerin bu hýrsýzlýðý fark edebileceði mesafe
+    [Header("Yakalanma Ayarlarï¿½")]
+    public float detectionRadius = 15f; // NPC'lerin bu hï¿½rsï¿½zlï¿½ï¿½ï¿½ fark edebileceï¿½i mesafe
+
+    public string GetPrompt() => "[E] Cal";
 
     public void Interact()
     {
-        // 1. EÞYAYI ÇANTAYA AT (Görünmez yap)
+        // 1. Eï¿½YAYI ï¿½ANTAYA AT (Gï¿½rï¿½nmez yap)
         gameObject.SetActive(false);
-        Debug.Log($"<color=yellow>[*] {itemName} çalýndý!</color>");
+        Debug.Log($"<color=yellow>[*] {itemName} ï¿½alï¿½ndï¿½!</color>");
 
-        // 2. ETRAFTAKÝ NPC'LERÝ TARA (Olay Yeri Ýnceleme)
-        // Objenin etrafýna görünmez bir küre çiziyoruz, içine giren adamlarý buluyoruz.
+        // 2. ETRAFTAKï¿½ NPC'LERï¿½ TARA (Olay Yeri ï¿½nceleme)
+        // Objenin etrafï¿½na gï¿½rï¿½nmez bir kï¿½re ï¿½iziyoruz, iï¿½ine giren adamlarï¿½ buluyoruz.
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, detectionRadius);
         bool caught = false;
 
@@ -24,46 +26,46 @@ public class StealableItem : MonoBehaviour, IInteractable
         {
             NPC_Roam npc = hitCollider.GetComponent<NPC_Roam>();
 
-            // Eðer kürenin içindeki obje bir NPC ise...
+            // Eï¿½er kï¿½renin iï¿½indeki obje bir NPC ise...
             if (npc != null)
             {
-                // 3. GÖRME AÇISI KONTROLÜ (Adamýn sýrtý mý dönük?)
+                // 3. Gï¿½RME Aï¿½ISI KONTROLï¿½ (Adamï¿½n sï¿½rtï¿½ mï¿½ dï¿½nï¿½k?)
                 Vector3 directionToPlayer = (transform.position - npc.transform.position).normalized;
                 float viewAngle = Vector3.Dot(npc.transform.forward, directionToPlayer);
 
-                // Dot çarpýmý 0'dan büyükse adamýn önündeyiz, bizi %100 gördü demektir!
+                // Dot ï¿½arpï¿½mï¿½ 0'dan bï¿½yï¿½kse adamï¿½n ï¿½nï¿½ndeyiz, bizi %100 gï¿½rdï¿½ demektir!
                 if (viewAngle > 0.1f)
                 {
-                    Debug.Log($"<color=red>[!] {npc.npcID} hýrsýzlýðý GÖRDÜ ve peþine düþtü!</color>");
+                    Debug.Log($"<color=red>[!] {npc.npcID} hï¿½rsï¿½zlï¿½ï¿½ï¿½ Gï¿½RDï¿½ ve peï¿½ine dï¿½ï¿½tï¿½!</color>");
                     caught = true;
 
-                    // UI'I HEMEN AÇMA! Sadece adamý peþimize takýyoruz.
+                    // UI'I HEMEN Aï¿½MA! Sadece adamï¿½ peï¿½imize takï¿½yoruz.
                     GameObject player = GameObject.FindGameObjectWithTag("Player");
                     npc.StartChasingPlayer(itemName, player.transform);
 
-                    break; // Sadece bir kiþi peþimize düþsün
+                    break; // Sadece bir kiï¿½i peï¿½imize dï¿½ï¿½sï¿½n
                 }
             }
         }
 
         if (!caught)
         {
-            Debug.Log("<color=green>Kimse görmedi, tereyaðýndan kýl çeker gibi çaldýk!</color>");
+            Debug.Log("<color=green>Kimse gï¿½rmedi, tereyaï¿½ï¿½ndan kï¿½l ï¿½eker gibi ï¿½aldï¿½k!</color>");
         }
     }
 
-    // 4. AGA BÜYÜ BURADA: Llama'yý Kýþkýrtma Fonksiyonu
+    // 4. AGA Bï¿½Yï¿½ BURADA: Llama'yï¿½ Kï¿½ï¿½kï¿½rtma Fonksiyonu
     private void ForceNpcReaction(NPC_Roam npc)
     {
         if (DialogSystem.Instance != null && NetworkManager.Instance != null)
         {
-            // Sohbet arayüzünü açýyoruz
+            // Sohbet arayï¿½zï¿½nï¿½ aï¿½ï¿½yoruz
             DialogSystem.Instance.StartChat(npc);
 
-            // Oyuncu mesajý YOK, ama eylem olarak HIRSIZLIK gönderiyoruz!
+            // Oyuncu mesajï¿½ YOK, ama eylem olarak HIRSIZLIK gï¿½nderiyoruz!
             string thePrompt = $"I just STOLE the {itemName} right in front of your eyes!";
 
-            // Metin olarak boþ (""), ama action olarak thePrompt yolluyoruz
+            // Metin olarak boï¿½ (""), ama action olarak thePrompt yolluyoruz
             NetworkManager.Instance.SendMessageToServer("", npc.npcID, thePrompt, npc.voiceModel);
         }
     }

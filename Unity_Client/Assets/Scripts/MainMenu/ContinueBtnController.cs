@@ -38,6 +38,11 @@ public class ContinueBtnController : MonoBehaviour
                                                     .FirstOrDefault();
             if (latestSaveFolder != null)
             {
+                // GameManager'a "bu DEVAM, su klasore ait" bilgisini birak.
+                PlayerPrefs.SetString(GameManager.PREF_ACTIVE_SAVE, latestSaveFolder.Name);
+                PlayerPrefs.SetInt(GameManager.PREF_IS_NEW_GAME, 0);
+                PlayerPrefs.Save();
+
                 UpdateSaveDate(latestSaveFolder.Name);
                 StartCoroutine(SendContinueRequestToPython(latestSaveFolder.Name));
             }

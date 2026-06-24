@@ -316,6 +316,11 @@ public class DialogSystem : MonoBehaviour
             currentNPC.EndDialog();
             currentNPC = null; // Haf�zay� temizle
         }
+
+        // KALICI HAFIZA: Konusma bittiginde Python'a "ozetle ve ChromaDB'ye kaydet" sinyali yolla.
+        // Boylece oyun kapatilip devam edildiginde NPC bu konusmayi hatirlar.
+        if (NetworkManager.Instance != null)
+            NetworkManager.Instance.SendEndChatSignal("default_player");
     }
 
     // Smoothly interpolates camera FOV

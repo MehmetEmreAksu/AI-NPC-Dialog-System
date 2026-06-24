@@ -67,6 +67,12 @@ Python_Backend/current_voice.wav
 Python_Backend/*.wav
 Python_Backend/apiKey.txt
 
+# PyInstaller
+*.spec
+
+# Paketlenmis backend exe'si (build artifakti; PyInstaller ile yeniden uretilir, commit'lenmez)
+Unity_Client/Assets/StreamingAssets/Backend/
+
 # ============================================================
 #  Unity (Unity_Client/)
 # ============================================================

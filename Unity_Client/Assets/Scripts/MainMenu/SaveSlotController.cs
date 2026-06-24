@@ -64,6 +64,12 @@ public class SaveSlotController : MonoBehaviour
         if (!string.IsNullOrEmpty(selectedFolderName))
         {
             Debug.Log($"{selectedFolderName} se�ildi. Python'a istek at�l�yor...");
+
+            // GameManager'a "bu DEVAM, su klasore ait" bilgisini birak (rolleri yeniden atma, hafizayi silme).
+            PlayerPrefs.SetString(GameManager.PREF_ACTIVE_SAVE, selectedFolderName);
+            PlayerPrefs.SetInt(GameManager.PREF_IS_NEW_GAME, 0);
+            PlayerPrefs.Save();
+
             UpdateSaveDate(selectedFolderName);
             StartCoroutine(SendLoadRequestToPython(selectedFolderName));
         }
@@ -148,4 +154,9 @@ public class GameSaveData
 {
     public string saveName;
     public string saveDate;
+
+    // Gizem rolleri: yeni oyunda bir kez atanip burada saklanir, devam edince okunur.
+    public string guiltyNPC;
+    public string suspectNPC;
+    public string innocentNPC;
 }

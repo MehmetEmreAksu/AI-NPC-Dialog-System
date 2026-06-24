@@ -69,7 +69,7 @@ public class NPC_Roam : MonoBehaviour
             if (Vector3.Distance(transform.position, targetPlayer.position) <= 2.5f)
             {
                 isChasing = false;
-                agent.speed = 3.5f;
+                agent.speed = 3.0f;
                 PrepareForDialog();
 
                 if (DialogSystem.Instance != null)

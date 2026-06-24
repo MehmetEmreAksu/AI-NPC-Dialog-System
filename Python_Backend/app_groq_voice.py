@@ -2,6 +2,7 @@ import json
 import os
 import uuid
 import io
+import tempfile
 import getpass
 import numpy as np
 import soundfile as sf
@@ -14,6 +15,11 @@ from groq import Groq
 
 app = Flask(__name__)
 
+# Ses dosyasini DAIMA mutlak bir yola yaz/oku. Frozen exe'de goreceli "current_voice.wav"
+# Flask tarafindan gecici _MEI klasorune gore aranip /get_audio'da 500 veriyordu.
+# temp klasoru hem mutlak hem garanti yazilabilir -> hem editör hem build'de calisir.
+SES_DOSYA_YOLU = os.path.join(tempfile.gettempdir(), "npc_current_voice.wav")
+
 # ==========================================
 # 1. YAPAY ZEKA VE API KONFİGÜRASYONU
 # ==========================================
@@ -23,12 +29,24 @@ def _load_api_key() -> str:
     env_key = os.environ.get("GROQ_API_KEY")
     if env_key:
         return env_key.strip()
-    key_file = Path(__file__).parent / "apiKey.txt"
-    if key_file.exists():
-        return key_file.read_text(encoding="utf-8").strip()
+
+    import sys
+    # PyInstaller ile .exe olunca __file__ gecici klasore isaret eder; bu yuzden
+    # apiKey.txt'yi birkac olasi konumda ariyoruz (exe yani, kaynak yani, calisma dizini).
+    aday_klasorler = []
+    if getattr(sys, "frozen", False):
+        aday_klasorler.append(Path(sys.executable).parent)  # exe'nin yanindaki klasor
+    aday_klasorler.append(Path(__file__).parent)            # kaynak dosya yani (editör/dev)
+    aday_klasorler.append(Path.cwd())                        # calisma dizini
+
+    for klasor in aday_klasorler:
+        key_file = klasor / "apiKey.txt"
+        if key_file.exists():
+            return key_file.read_text(encoding="utf-8").strip()
+
     raise RuntimeError(
         "Groq API anahtarı bulunamadı. GROQ_API_KEY ortam değişkenini ayarla "
-        "ya da Python_Backend/apiKey.txt dosyasına anahtarı yaz."
+        "ya da apiKey.txt dosyasini exe'nin (veya Python_Backend'in) yanina koy."
     )
 
 client = Groq(api_key=_load_api_key())
@@ -60,11 +78,11 @@ def veritabani_baglatisini_kur(save_folder_name):
         # --------------------------------------------------------------------------- ÖNEMLİ
         # --------------------------------------------------------------------------- ÖNEMLİ
         # --------------------------------------------------------------------------- ÖNEMLİ
-        company_name = "DefaultCompany" # Kendi ayarlarına göre düzeltmeyi unutma
+        company_name = "BabanınYeri"        # Unity Player Settings > Company Name ile BIREBIR ayni
         # --------------------------------------------------------------------------- ÖNEMLİ
         # --------------------------------------------------------------------------- ÖNEMLİ
         # --------------------------------------------------------------------------- ÖNEMLİ
-        game_name = "OyunIsmi"          # Kendi ayarlarına göre düzeltmeyi unutma
+        game_name = "AI NPC Simulator"       # Unity Player Settings > Product Name ile BIREBIR ayni
         # --------------------------------------------------------------------------- ÖNEMLİ
         # --------------------------------------------------------------------------- ÖNEMLİ
         # --------------------------------------------------------------------------- ÖNEMLİ
@@ -141,7 +159,7 @@ def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice
     # ==========================================
     gizli_talimat = ""
 
-    if npc_id == "Demirci":
+    if npc_id == "Blacksmith":
         if npc_role == "Innocent":
             gizli_talimat = f"You are innocent. You didn't steal the Silver Goblet. You saw {suspect_name} acting very nervous near the well. Tell the player to question them."
         elif npc_role == "Suspect":
@@ -149,7 +167,7 @@ def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice
         elif npc_role == "Guilty":
             gizli_talimat = f"You ARE the thief who stole the Silver Goblet. Deny everything aggressively. BUT, IF the player mentions the clue from {suspect_name}, you MUST panic, confess to the crime, set your JSON npc_action to 'confess', and say 'I hid the goblet by the old well!'"
 
-    elif npc_id == "Tuccar":
+    elif npc_id == "Merchant":
         if npc_role == "Innocent":
             gizli_talimat = f"You are innocent. You don't know who stole the Goblet, but you noticed {suspect_name} looking very guilty. Advise the player to investigate them, while trying to sell junk."
         elif npc_role == "Suspect":
@@ -157,7 +175,7 @@ def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice
         elif npc_role == "Guilty":
             gizli_talimat = f"You ARE the thief. Play the role of an innocent merchant. BUT, IF the player mentions the clue from {suspect_name}, your facade breaks. You MUST confess, set your JSON npc_action to 'confess', and cry 'I hid it by the old well!'"
 
-    elif npc_id == "Muhtar":
+    elif npc_id == "Headman":
         if npc_role == "Innocent":
             gizli_talimat = f"You are innocent and stressed about the stolen Goblet. You noticed {suspect_name} acting strangely. Order the player to question them."
         elif npc_role == "Suspect":
@@ -199,13 +217,25 @@ def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice
                 {
                     "role": "system",
                     "content": (
-                        "You are an autonomous NPC in a modern RPG game. "
+                        "You are an autonomous NPC living in a small MEDIEVAL FANTASY VILLAGE. "
                         f"{day_night}"
                         f"Your character instructions: {gizli_talimat}"
-                        "React naturally and in-character. SPEAK IN PLAIN, MODERN ENGLISH. "
+                        "React naturally and in-character. Use clear, simple English (but never reference the real modern world). "
+                        # DUNYA KISITI: NPC sadece kendi cagindaki/koyundeki seyleri bilsin, modern seyleri bilmesin.
+                        "WORLD RULE: You ONLY know what a simple villager of this medieval world would plausibly know "
+                        "(your own trade, your neighbors, local rumors, this village and its surroundings). "
+                        "You have NEVER heard of the modern world: no technology, internet, electricity, guns, cars, "
+                        "countries, science, diseases like COVID, or famous people. If the player asks about anything "
+                        "outside your world, react with genuine, simple confusion (e.g. 'I know not what you speak of, stranger') "
+                        "and steer back to village matters. NEVER explain modern concepts and NEVER break character. "
+                        "Do NOT invent facts about the theft or the village beyond your character instructions; "
+                        "if you do not know something, simply say you do not know. "
                         # BÜYÜ BURADA: JSON formatına "confess" aksiyonunu öğrettik!
                         "YOU MUST RESPOND STRICTLY IN THE FOLLOWING JSON FORMAT: "
                         "{\"npc_message\": \"Your spoken response\", \"npc_emotion\": \"terrified, defeated, angry, suspicious, calm\", \"npc_action\": \"attack, retreat, confess, idle\"}"
+                        " CRITICAL: The MOMENT you admit you are the thief and reveal that you hid it by the old well, "
+                        "you MUST set npc_action EXACTLY to \"confess\" (not idle, not anything else). "
+                        "Only use \"confess\" when you are truly admitting the crime."
                     )
                 },
                 {
@@ -260,7 +290,7 @@ def npc_beynini_calistir(player_id, npc_id, player_message, player_action, voice
             with io.BytesIO(ham_bytes) as buf:
                 data, samplerate = sf.read(buf, dtype='int16')
 
-            wavfile.write("current_voice.wav", samplerate, data)
+            wavfile.write(SES_DOSYA_YOLU, samplerate, data)
             print(f"[+] Ses 16-bit PCM olarak kaydedildi. Samplerate: {samplerate}")
 
             # Unity'e "Sesin adresi burada, gel al" diyoruz
@@ -392,8 +422,10 @@ def sohbeti_bitir():
     # Dictionary boyutu değişeceği için list() ile kopyasını alıp dönüyoruz
     for anahtar in list(gecici_hafiza.keys()):
         if anahtar.startswith(f"{player_id}_") and len(gecici_hafiza[anahtar]) > 0:
-            # Anahtardan npc_id'yi çıkaralım (Örn: default_player_Demirci -> Demirci)
-            npc_id = anahtar.split("_")[1] if "_" in anahtar else "Default_NPC"
+            # Anahtardan npc_id'yi çıkaralım. DİKKAT: player_id'nin kendisinde alt çizgi
+            # olabilir (örn "default_player"), bu yüzden split("_")[1] YANLIS olur.
+            # Onun yerine "player_id_" önekini kırpıyoruz: default_player_Demirci -> Demirci
+            npc_id = anahtar[len(player_id) + 1:]
 
             anilari_ozetle_ve_kaydet(player_id, npc_id, gecici_hafiza[anahtar])
             gecici_hafiza[anahtar].clear()
@@ -406,7 +438,7 @@ def sohbeti_bitir():
 # ==========================================
 @app.route('/get_audio', methods=['GET'])
 def ses_dosyasini_gonder():
-    return send_file("current_voice.wav", mimetype="audio/wav")
+    return send_file(SES_DOSYA_YOLU, mimetype="audio/wav")
 
 @app.route('/load_save', methods=['POST'])
 def save_dosyasini_yukle():
@@ -422,8 +454,8 @@ def save_dosyasini_yukle():
         veritabani_baglatisini_kur(save_folder)
         
         # 2. Önceki save dosyasından kalan RAM'deki (geçici) muhabbetleri temizle
-        gecici_hafiza.clear() 
-        
+        gecici_hafiza.clear()
+
         return jsonify({"status": "success", "message": f"Sistem {save_folder} için hazır."}), 200
         
     except Exception as e:
@@ -448,5 +480,43 @@ def hafizayi_sifirla():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/shutdown', methods=['POST'])
+def sunucuyu_kapat():
+    print("\n[BİLGİ] Unity'den kapatma sinyali geldi, sunucu intihar ediyor...\n")
+    # Sunucuyu işletim sistemi seviyesinde acımasızca öldürür
+    os._exit(0)
+    return jsonify({"status": "kapanıyor"}), 200
+
+def _parent_watchdog(parent_pid):
+    """Unity (parent) sureci olunce backend KENDINI kapatir. Unity'nin kapanis kodlarina
+    (OnApplicationQuit/taskkill) bagli kalmaz; crash / Alt+F4 / Gorev Yoneticisi dahil HER
+    durumda calisir, boylece arkada zombi app_groq_voice.exe kalmaz."""
+    import time, ctypes
+    PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+    STILL_ACTIVE = 259
+    kernel32 = ctypes.windll.kernel32
+    while True:
+        time.sleep(2)
+        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, parent_pid)
+        if not handle:
+            os._exit(0)  # parent tamamen yok -> kendini kapat
+        exit_code = ctypes.c_ulong()
+        ok = kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code))
+        kernel32.CloseHandle(handle)
+        if ok and exit_code.value != STILL_ACTIVE:
+            os._exit(0)  # parent cikti -> kendini kapat
+
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    import sys, threading
+    # Unity, kendi PID'ini ilk arguman olarak gecer (PythonLauncher). Varsa izlemeyi baslat.
+    if len(sys.argv) > 1:
+        try:
+            _ppid = int(sys.argv[1])
+            threading.Thread(target=_parent_watchdog, args=(_ppid,), daemon=True).start()
+            print(f"[WATCHDOG] Unity PID {_ppid} izleniyor; o surec olunce backend kapanacak.")
+        except ValueError:
+            pass
+
+    # debug=False: reloader'i kapatir (ikinci/zombi surec olmasin). Yayin/build icin dogru olan bu.
+    app.run(debug=False, host='0.0.0.0', port=8000, use_reloader=False, threaded=True)
